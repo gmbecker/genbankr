@@ -1,0 +1,17 @@
+FEATURES             Location/Qualifiers
+     source          1..235233
+                     /organism="Human herpesvirus 5"
+                     /mol_type="genomic DNA"
+                     /strain="VR1814"
+                     /isolation_source="cervical secretions of a pregnant woman
+                     with a primary HCMV infection"
+                     /host="Homo sapiens"
+                     /db_xref="taxon:10359"
+                     /country="Italy"
+                     /collection_date="1996"
+                     /note="unpassaged strain in the original clinical sample;
+                     acronym: HCMV; acronym: HHV-5"
+     variation       10999..12108
+                     /note="major in fibroblast cell passage 214; major in
+                     endothelial cell passage 199"
+                     /replace=""
