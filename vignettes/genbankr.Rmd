@@ -1,0 +1,178 @@
+---
+title: "The genbankr package"
+author: "Gabriel Becker"
+output: 
+  BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{genbankr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}  
+---
+
+
+
+# Basic usage
+
+Simply put, the `genbankr` package parses files in the NCBI's GenBank (gb/gbk)
+format into R.
+
+The primary workhorse is provided by the `readGenBank` function, which accepts 
+either a GenBank file (via the `file` argument) or raw text in the GenBank 
+format (via the `text` argument).
+
+```{r}
+suppressPackageStartupMessages(library(genbankr))
+gb = readGenBank("sample.gbk")
+gb
+```
+
+`readGenBank` generates a `GenBankFull` object, which contains the annotations and 
+the origin sequence. *genbankr* provides methods for the *AnnotationDbi* API 
+functions for retrieving information from the object.
+
+We can retreive the genes via the function of the same name:
+
+```{r}
+genes(gb)
+```
+
+We can also do the same for exons, cds elements, and transcripts (code run but output ommitted for brevity):
+
+```{r, results='hide'}
+cds(gb)
+exons(gb)
+transcripts(gb)
+```
+
+We can also access elements not in the standard TxDb API, such as variants and features which don't fit into any of the other categories:
+```{r, results='hide'}
+variants(gb)
+otherFeatures(gb)
+
+```
+
+Furthermore, we can access header-level information via accessors as well:
+
+```{r}
+accession(gb)
+vers(gb)
+```
+
+We can get the seqinfo for a `GenBankAnnot`/`GenBankFull` object:
+```{r}
+seqinfo(gb)
+```
+
+Finally, we can ge the sequence itself from a `GenBankFull` object:
+```{r}
+getSeq(gb)
+```
+
+# Low level parsing
+
+While use and integration of the Bioconductor machinery is recommended, we also provide low-level parsing capabilities via the workhorse `parseGenBank` function. This function returns a list structure roughly corresponding to the top-level headings within the  genbank format itself:
+
+```{r}
+pg = parseGenBank("sample.gbk")
+str(pg, max.level = 1)
+```
+
+# retaining the genomic sequence
+
+If desired, `readGenBank` and `parseGenBank` can omit full sequence of the organism by specifying `ret.seq=FALSE`. In this case, `readGenBank` returns a `GenBankAnnot` object, rather than a `GenBankFull`
+
+```{r}
+gbf = readGenBank("sample.gbk", ret.seq = FALSE)
+gbf
+```
+
+All of the accessor methods discussed above work for `GenBankFull` objects as they do for `GenBankAnnot` objects.
+
+# rtracklayer style import
+
+We also provide a convenience method for using *rtracklayer* `import` style mechanics for reading GenBank files:
+
+```{r}
+gbkfile = GenBankFile("sample.gbk")
+gb2 = import(gbkfile)
+```
+
+# Retrieving and parsing GenBank information by Versioned Accession
+
+*genbankr* provides the `GBAccession` class and constructor for representing versioned Nuccore accession numbers. 
+
+```{r}
+gba = GBAccession("U49845.1")
+gba
+```
+
+These accession objects can be passed directly to readGenBank:
+
+```{r}
+readGenBank(gba, partial=TRUE)
+```
+
+# Retrieving only origin sequence
+
+`genbankr` also provides a fastpath for extracting only the sequence of an 
+organism. We can call `getSeq` on a `GenBankFile` or `GBAccession` object
+
+```{r}
+getSeq(gbkfile)
+```
+
+Additionally, we can specify `seq.only = TRUE` in `parseGenBank`
+
+```{r}
+parseGenBank("sample.gbk", seq.only=TRUE)
+```
+
+
+# Details and caveats
+
+Often times, GenBank files don't contain exhaustive annotations.
+For example, files including CDS annotations often do not have separate
+transcript features.  Furthermore, chromosomes are not always named,
+particularly in organisms that have only one. The details of how genbankr
+handles such cases are as follows:
+
+
+In files where CDSs are annotated but individual exons are not, 'approximate
+exons' are defined as the individual contiguous elements within each CDS.
+Currently, no mixing of approximate and explicitly annotated exons is
+performed, even in cases where, e.g., exons are not annotated for some
+genes with CDS annotations.
+
+
+In files where transcripts are not present, 'approximate transcripts'
+defined by the ranges spanned by groups of exons are used.  Currently, we do
+not support generating approximate transcripts from CDSs in files that
+contain actual transcript annotations, even if those annotations do not
+cover all genes with CDS/exon annotations.
+
+
+Features  (gene, cds, variant, etc) are assumed to be contained within the
+most recent previous source feature (chromosome/physical piece of DNA).
+Chromosome name for source features (seqnames in the resulting
+GRanges}/VRanges is determined  as follows:
+
+1. The 'chromosome' attribute, as is (e.g., "chr1");
+2. the 'strain' attribute, combined with auto-generated count (e.g., "VR1814:1");
+3. the 'organism' attribute, combined with auto-generated count (e.g."Human herpesvirus 5:1")
+
+
+Some GenBank files do not include origin sequence. In these cases, variation features are not supported, as there is no self-contained way to determine reference sequence and the features themselves typically contain only alt information (if that). In the case of files containing variation features but no origin sequence, those features are ignored with a warning. 
+
+Currently some information about from the header of a GenBank file,
+primarily reference and author based information, is not captured and
+returned. Please contact the maintainer if you have a direct use-case for
+this type of information.
+
+# Performance 
+
+We have taken pains to make the genbankr parser as effcient as easily possible.
+On our local machines, a 19MB genbank file takes 2-3 minutes to be parsed.
+That said, this package is not tested and likely is not suitable for
+processing extremely large genbank files. We suggest obtaining the annotations
+in a different format in such cases.
+
