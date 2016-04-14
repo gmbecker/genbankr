@@ -17,15 +17,16 @@ be included. Otherwise, non-exact features are excluded, with a warning
 if \code{partial} is \code{NA} (the default).}
 
 \item{ret.seq}{logical. Should an object containing the raw ORIGIN sequence be
-created and returned. Defaults to \code{TRUE}}
+created and returned. Defaults to \code{TRUE}. If \code{FALSE},
+the sequence slot is set to \code{NULL}. See NOTE.}
 
 \item{verbose}{logical. Should informative messages be printed to the
 console as the file is processed. Defaults to \code{FALSE}.}
 }
 \value{
-A \code{GenBankAnnot} or \code{GenBankFull} object containing (most,
+A \code{GenBankRecord} object containing (most,
 see detaisl) of the information within \code{file}/\code{text} Or a list of
-\code{GenBankAnnot}/\code{GenBankFull} objects in cases where a
+\code{GenBankRecord} objects in cases where a
 \code{GBAccession} vector with more than one ID in it is passed to \code{file}
 }
 \description{
@@ -34,11 +35,9 @@ and read one based on an accession number. See Details for exact
 behavior.
 }
 \details{
-If a a\code{GBAccession} object is passed to \code{file}, the
+If a a \code{GBAccession} object is passed to \code{file}, the
 rentrez package is used to attempt to fetch full GenBank records for all
 ids in the 
-
-
 
 Often times, GenBank files don't contain exhaustive annotations.
 For example, files including CDS annotations often do not have separate
@@ -88,6 +87,14 @@ We have endeavored to make this parser as effcient as easily possible.
 On our local machines, a 19MB genbank file takes 2-3 minutes to be parsed.
 That said, this function is not tested and likely not suitable for
 processing extremely large genbank files.
+
+The origin sequence is always parsed when calling readGenBank, because
+it is necessary to generate a VRanges from variant features. So currently
+\code{ret.seq=FALSE} will not reduce parsing time, or maximum memory usage,
+though it will reduce memory usage by the final GenBankRecord object. The
+lower-level parseGenBank does skil parsing the sequence at all via
+\code{ret.seq=FALSE}, but variant annotations will be excluded if
+make_gbrecord is called on the resulting parsed list.
 }
 \examples{
 gb = readGenBank(system.file("sample.gbk", package="genbankr"))

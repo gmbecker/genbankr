@@ -5,7 +5,7 @@
 \title{Parse raw genbank file content}
 \usage{
 parseGenBank(file, text = readLines(file), partial = NA, verbose = FALSE,
-  seq.only = FALSE)
+  ret.anno = TRUE, ret.seq = TRUE)
 }
 \arguments{
 \item{file}{character. The file to be parsed. Ignored if \code{text} is
@@ -20,13 +20,17 @@ if \code{partial} is \code{NA} (the default).}
 \item{verbose}{logical. Should informative messages be printed to the
 console as the file is being processed.}
 
-\item{seq.only}{logical. Should a fast-path which extracts only the origin
-sequence be used, rather than processing the entire file. (Defaults to
-\code{FALSE}}
+\item{ret.anno}{logical. Should the annotations in the GenBank file be
+parsed and included in the returned object. (Defaults to \code{TRUE})}
+
+\item{ret.seq}{logical. Should the origin sequence (if present) in the
+GenBank file be included in the returned object. (Defaults to \code{TRUE})}
 }
 \value{
-A list containing the parsed contents of the file, suitable for
-passing to \code{make_gbannot} or \code{make_gbfull}
+if \code{ret.anno} is \code{TRUE}, a list containing the parsed
+contents of the file, suitable for passing to \code{make_gbrecord}. If
+\code{ret.anno} is \code{FALSE}, a \code{DNAStringSet} object containing
+the origin sequence.
 }
 \description{
 Parse genbank content and return a low-level list object

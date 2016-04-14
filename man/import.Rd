@@ -18,7 +18,7 @@
 \item{...}{Arguments passed to \code{readGenBank}}
 }
 \value{
-A \code{GenBankFull} or \code{GenBankAnnot} object.
+A \code{GenBankRecord} object.
 }
 \description{
 Import a genbank file using the rtracklayer API.

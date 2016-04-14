@@ -3,20 +3,16 @@
 \docType{methods}
 \name{otherFeatures}
 \alias{otherFeatures}
-\alias{otherFeatures,GenBankAnnot}
-\alias{otherFeatures,GenBankAnnot-method}
-\alias{otherFeatures,GenBankFull}
-\alias{otherFeatures,GenBankFull-method}
+\alias{otherFeatures,GenBankRecord}
+\alias{otherFeatures,GenBankRecord-method}
 \title{Retrieve 'other' features}
 \usage{
 otherFeatures(x)
 
-\S4method{otherFeatures}{GenBankAnnot}(x)
-
-\S4method{otherFeatures}{GenBankFull}(x)
+\S4method{otherFeatures}{GenBankRecord}(x)
 }
 \arguments{
-\item{x}{a GenBankAnnot or GenBankFull object}
+\item{x}{a GenBankRecord object}
 }
 \value{
 A GRanges containing the features which don't fall into another

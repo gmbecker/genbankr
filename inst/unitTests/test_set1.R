@@ -3,21 +3,48 @@ library(genbankr)
 library(RUnit)
 
 
-checkVars = function() {
-    raw = parseGenbank("vars.gbk")
+test_Vars = function() {
+    ## raw = parseGenBank("vars.gbk")
+    raw = parseGenBank(system.file("unitTests/vars.gbk", package="genbankr"))
     feats = raw$FEATURES
     checkEquals(length(feats), 5L, "Reading variation test did not return 5 features (4 variants and source)")
-    gba = genbankr::make_gbannot(raw)
+    gba = genbankr::make_gbrecord(raw)
     vr = gba@variations
     checkEquals(length(vr), 4L, "Variation test didn't result in 4 variants")
 }
 
-checkJoinCompl = function() {
-    raw = parseGenbank("compjoin.gbk")
+test_JoinCompl = function() {
+    ## raw = parseGenBank("compjoin.gbk")
+    raw = parseGenBank(system.file("unitTests/compjoin.gbk", package="genbankr"))
     feats = raw$FEATURES
     checkEquals(length(feats), 5L, "Reading complement join test did not return 5 features (2 genes, 2 cdss, and source)")
-    gba = genbankr::make_gbannot(raw)
+    gba = genbankr::make_gbrecord(raw)
     cdss = cds(gba)
     checkEquals(length(cdss), 6L, "Complement join/complement order test did not detect all 6 cds fragments (3 for comp(join()) and 3 for comp(order)).")
     
 }
+
+test_RetSeqFalse = function() {
+    raw = readGenBank(system.file("unitTests/vars.gbk",package="genbankr"),
+                      ret.seq=FALSE)
+    checkTrue(is(raw, "GenBankRecord"), "Checking that readGenBank is callable with ret.seq=FALSE")
+    checkTrue(is.null(getSeq(raw)), "Checking that sequence is returned as NULL with ret.seq=FALSE")
+}
+
+test_MultVal = function() {
+    res1 = readGenBank(system.file("unitTests/multval.gbk", package="genbankr"))
+    vars = variants(res1)
+    checkTrue(is(vars$note, "CharacterList"), "Checking that unexpected duplicate columns result in CharacterList (singular feature)")
+    res2 = readGenBank(system.file("unitTests/multval.gbk", package="genbankr"))
+    vars2 = variants(res2)
+    checkTrue(is(vars2$note, "CharacterList"), "Checking that unexpected duplicate columns result in CharacterList (one of many features)")
+    checkTrue(is(sources(res2)$db_xref, "CharacterList"), "Checking that known multivalue field (db_xref) results in CharacterList even when not duplicated in any features")
+}
+
+test_getSeq = function() {
+    fil = GenBankFile(system.file("unitTests/vars.gbk", package="genbankr"))
+    sq = getSeq(fil)
+    checkTrue(is(sq, "DNAStringSet") && Biostrings::width(sq) == 11820)
+}
+    
+    

@@ -3,26 +3,22 @@
 \docType{methods}
 \name{variants}
 \alias{variants}
-\alias{variants,GenBankAnnot}
-\alias{variants,GenBankAnnot-method}
-\alias{variants,GenBankFull}
-\alias{variants,GenBankFull-method}
+\alias{variants,GenBankRecord}
+\alias{variants,GenBankRecord-method}
 \title{Retrieve variantion features}
 \usage{
 variants(x)
 
-\S4method{variants}{GenBankAnnot}(x)
-
-\S4method{variants}{GenBankFull}(x)
+\S4method{variants}{GenBankRecord}(x)
 }
 \arguments{
-\item{x}{a GenBankAnnot or GenBankFull object}
+\item{x}{a GenBankRecord object}
 }
 \value{
 A VRanges containing the variations annotated in the source file
 }
 \description{
-Extract the annotated variants from a GenBankAnnot or GenBankFull object
+Extract the annotated variants from a GenBankRecord object
 }
 \examples{
 gb = readGenBank(system.file("sample.gbk", package="genbankr"))
