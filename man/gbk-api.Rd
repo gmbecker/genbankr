@@ -3,29 +3,28 @@
 \docType{methods}
 \name{gbk-specific-api}
 \alias{accession}
-\alias{accession,GenBankAnnot}
-\alias{accession,GenBankAnnot-method}
-\alias{accession,GenBankFull}
-\alias{accession,GenBankFull-method}
+\alias{accession,GenBankRecord}
+\alias{accession,GenBankRecord-method}
 \alias{gbk-specific-api}
+\alias{sources}
+\alias{sources,GenBankRecord}
+\alias{sources,GenBankRecord-method}
 \alias{vers}
-\alias{vers,GenBankAnnot}
-\alias{vers,GenBankAnnot-method}
-\alias{vers,GenBankFull}
-\alias{vers,GenBankFull-method}
+\alias{vers,GenBankRecord}
+\alias{vers,GenBankRecord-method}
 \title{genbankr specific api}
 \usage{
 accession(x, ...)
 
-\S4method{accession}{GenBankAnnot}(x)
-
-\S4method{accession}{GenBankFull}(x)
+\S4method{accession}{GenBankRecord}(x)
 
 vers(x, ...)
 
-\S4method{vers}{GenBankAnnot}(x)
+\S4method{vers}{GenBankRecord}(x)
 
-\S4method{vers}{GenBankFull}(x)
+sources(x, ...)
+
+\S4method{sources}{GenBankRecord}(x)
 }
 \arguments{
 \item{x}{A genbank annotation object}

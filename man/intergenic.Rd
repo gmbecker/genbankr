@@ -3,22 +3,17 @@
 \docType{methods}
 \name{intergenic}
 \alias{intergenic}
-\alias{intergenic,GenBankAnnot-method}
-\alias{intergenic,GenBankFull-method}
+\alias{intergenic,GenBankRecord-method}
 \title{Extract intergenic regions from processed GenBank annotations}
 \usage{
-\S4method{intergenic}{GenBankAnnot}(x)
-
-\S4method{intergenic}{GenBankFull}(x)
+\S4method{intergenic}{GenBankRecord}(x)
 }
 \arguments{
-\item{x}{A GenBankAnnot or GenBankFull object}
+\item{x}{A GenBankRecord object}
 }
 \value{
 A GRanges for the intergenic regions, defined as regions not
 overlapping any genes defined in the annotations on either strand.
-
-A \code{GRanges} object
 }
 \description{
 Extract the intergenic regions from a set of GenBank annotations.

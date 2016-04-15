@@ -1,17 +1,18 @@
+setOldClass("NULL")
+setClassUnion("DNAStringSetOrNULL", c("DNAStringSet", "NULL"))
+
 ##' @title GenBank data objects
 ##'
 ##' 
-##' @description These objects represent GenBank annotations (GenBankAnnot) and
-##' those annotations paired with raw reference/origin sequence
-##' (GenBankFull).
+##' @description These objects represent GenBank annotations 
 ##' 
 ##' @rdname GenBank-classes
 ##' @docType methods
 ##' @examples
 ##' gb = readGenBank(system.file("sample.gbk", package="genbankr"))
 ##' gb
-##' @exportClass GenBankAnnot
-setClass("GenBankAnnot", slots = list(genes = "GenomicRanges", cds = "GenomicRanges",
+##' @exportClass GenBankRecord
+setClass("GenBankRecord", slots = list(genes = "GenomicRanges", cds = "GenomicRanges",
                                       exons = "GenomicRanges",
                                       transcripts = "GenomicRanges",
                                       variations = "VRanges",
@@ -21,16 +22,10 @@ setClass("GenBankAnnot", slots = list(genes = "GenomicRanges", cds = "GenomicRan
                                       definition = "character",
                                       accession = "character",
                                       version = "character",
-                                      source = "ANY"
+                                      source = "ANY",
+                                      sequence = "DNAStringSetOrNULL"
                                       )
          )
-
-
-##' @rdname GenBank-classes
-##' @docType methods
-##' @exportClass GenBankFull
-setClass("GenBankFull", slots = list(annotations = "GenBankAnnot",
-                                     sequence = "DNAStringSet"))
 
 
 

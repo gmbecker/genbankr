@@ -1,14 +1,25 @@
 Package: genbankr
-Version: 0.99.4
+Version: 0.99.5
 Title: Parsing GenBank files into semantically useful objects
 Description: Reads Genbank files.
 Author: Gabriel Becker
 Copyright: Genentech, Inc.
-Depends: methods
-Imports: BiocGenerics, IRanges, GenomicRanges(>= 1.23.24),
-        GenomicFeatures, Biostrings, VariantAnnotation, rtracklayer,
-        S4Vectors, BSgenome, GenomeInfoDb
-Suggests: RUnit, rentrez, knitr
+Depends:
+    methods
+Imports:
+    BiocGenerics,
+    IRanges,
+    GenomicRanges(>= 1.23.24),
+    GenomicFeatures,
+    Biostrings,
+    VariantAnnotation,
+    rtracklayer,
+    S4Vectors,
+    GenomeInfoDb
+Suggests:
+    RUnit,
+    rentrez,
+    knitr
 Maintainer: Gabriel Becker <becker.gabriel@gene.com>
 VignetteBuilder: knitr
 License: Artistic-2.0

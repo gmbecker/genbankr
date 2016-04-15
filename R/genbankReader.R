@@ -21,16 +21,15 @@ NULL
 ##' be included. Otherwise, non-exact features are excluded, with a warning
 ##' if \code{partial} is \code{NA} (the default).
 ##' @param ret.seq logical. Should an object containing the raw ORIGIN sequence be
-##' created and returned. Defaults to \code{TRUE}
+##' created and returned. Defaults to \code{TRUE}. If \code{FALSE},
+##' the sequence slot is set to \code{NULL}. See NOTE.
 ##' @param verbose logical. Should informative messages be printed to the
 ##' console as the file is processed. Defaults to \code{FALSE}.
 ##'
-##' @details If a a\code{GBAccession} object is passed to \code{file}, the
+##' @details If a a \code{GBAccession} object is passed to \code{file}, the
 ##' rentrez package is used to attempt to fetch full GenBank records for all
 ##' ids in the 
 ##'
-##' 
-##' 
 ##' Often times, GenBank files don't contain exhaustive annotations.
 ##' For example, files including CDS annotations often do not have separate
 ##' transcript features.  Furthermore, chromosomes are not always named,
@@ -77,11 +76,19 @@ NULL
 ##' @note We have endeavored to make this parser as effcient as easily possible.
 ##' On our local machines, a 19MB genbank file takes 2-3 minutes to be parsed.
 ##' That said, this function is not tested and likely not suitable for
-##' processing extremely large genbank files. 
+##' processing extremely large genbank files.
+##'
+##' @note The origin sequence is always parsed when calling readGenBank, because
+##' it is necessary to generate a VRanges from variant features. So currently
+##' \code{ret.seq=FALSE} will not reduce parsing time, or maximum memory usage,
+##' though it will reduce memory usage by the final GenBankRecord object. The
+##' lower-level parseGenBank does skil parsing the sequence at all via
+##' \code{ret.seq=FALSE}, but variant annotations will be excluded if
+##' make_gbrecord is called on the resulting parsed list.
 ##' 
-##' @return A \code{GenBankAnnot} or \code{GenBankFull} object containing (most,
+##' @return A \code{GenBankRecord} object containing (most,
 ##' see detaisl) of the information within \code{file}/\code{text} Or a list of
-##' \code{GenBankAnnot}/\code{GenBankFull} objects in cases where a
+##' \code{GenBankRecord} objects in cases where a
 ##' \code{GBAccession} vector with more than one ID in it is passed to \code{file}
 ##' @examples
 ##' gb = readGenBank(system.file("sample.gbk", package="genbankr"))
@@ -89,15 +96,24 @@ NULL
 readGenBank = function(file, text = readLines(file), partial = NA,
                        ret.seq = TRUE, verbose = FALSE) {
 
-    if(missing(text) && is(file, "GBAccession"))
-        text = .getGBfromNuccore(file)
+    if(missing(text)) {
+        if(missing(file))
+            stop("One of text or file must be specified.")
+        if(is(file, "GBAccession"))
+            text = .getGBfromNuccore(file)
+        else if (!file.exists(file))
+            stop("file does not appear to an existing file or a GBAccession object. Valid file or text argument is required.")
+    }
+            
     if(is(text, "list"))
         return(lapply(text, function(txt) readGenBank(text = txt, partial = partial, ret.seq= ret.seq, verbose = verbose)))
-    prsed = parseGenBank(text = text, partial = partial, verbose = verbose)
+    ## we always read in sequence because it is required for variant annotations
+    ## we throw it away after if the user set ret.seq=FALSE
+    prsed = parseGenBank(text = text, partial = partial, verbose = verbose,
+                         ret.seq = TRUE)
+    ret = make_gbrecord(rawgbk = prsed, verbose = verbose)
     if(!ret.seq)
-        ret = make_gbannot(rawgbk = prsed, verbose = verbose)
-    else
-        ret = make_gbfull(rawgbk = prsed, verbose = verbose)
+        sequence(ret) = NULL
     ret
 }
 
@@ -345,7 +361,11 @@ readOrigin = function(lines) {
     ## strip spacing and line numbering
     regex = "([[:space:]]+|[[:digit:]]+|//)"
     
-    DNAString(paste(gsub(regex, "", lines[-1]), collapse=""))
+    dnachar = gsub(regex, "", lines[-1])
+    if(any(nzchar(dnachar)))
+        DNAString(paste(dnachar, collapse=""))
+    else
+        NULL
 }
 
 
@@ -373,11 +393,14 @@ fastwriteread = function(txtline) {
 ##' if \code{partial} is \code{NA} (the default).
 ##' @param verbose logical. Should informative messages be printed to the
 ##' console as the file is being processed.
-##' @param seq.only logical. Should a fast-path which extracts only the origin
-##' sequence be used, rather than processing the entire file. (Defaults to
-##' \code{FALSE}
-##' @return A list containing the parsed contents of the file, suitable for
-##' passing to \code{make_gbannot} or \code{make_gbfull}
+##' @param ret.anno logical. Should the annotations in the GenBank file be
+##' parsed and included in the returned object. (Defaults to \code{TRUE})
+##' @param ret.seq logical. Should the origin sequence (if present) in the
+##' GenBank file be included in the returned object. (Defaults to \code{TRUE})
+##' @return if \code{ret.anno} is \code{TRUE}, a list containing the parsed
+##' contents of the file, suitable for passing to \code{make_gbrecord}. If
+##' \code{ret.anno} is \code{FALSE}, a \code{DNAStringSet} object containing
+##' the origin sequence.
 ##' @note This is a low level function not intended for common end-user use.
 ##' In nearly all cases, end-users (and most developers) should call
 ##' \code{readGenBank} or create a \code{GenBankFile} object and call
@@ -388,8 +411,13 @@ fastwriteread = function(txtline) {
 
 parseGenBank = function(file, text = readLines(file),  partial = NA,
                         verbose = FALSE,
-                        seq.only = FALSE) {
+                        ret.anno = TRUE,
+                        ret.seq = TRUE) {
+    if(!ret.anno && !ret.seq)
+        stop("Must return at least one of annotations or sequence.")
     bf = proc.time()["elapsed"]
+    if(missing(text) && !file.exists(file))
+        stop("No text provided and file does not exist or was not specified. Either an existing file or text to parse must be provided.")
     if(length(text) == 1)
         text = fastwriteread(text)
     
@@ -400,9 +428,11 @@ parseGenBank = function(file, text = readLines(file),  partial = NA,
     spl = split(text, fldnames)
     
     resthang = list(FEATURES = readFeatures(spl[["FEATURES"]],
-                                            source.only=seq.only),
-                    ORIGIN = readOrigin(spl[["ORIGIN"]]))
-    if(!seq.only) {
+                                            source.only=!ret.anno))
+
+    resthang$ORIGIN = if(ret.seq) readOrigin(spl[["ORIGIN"]]) else NULL
+    
+    if(ret.anno) {
         resthang2 = mapply(function(field, lines, verbose) {
             switch(field,
                    LOCUS = readLocus(lines),
@@ -422,19 +452,19 @@ parseGenBank = function(file, text = readLines(file),  partial = NA,
     }
     ##DNAString to DNAStringSet
     origin = resthang$ORIGIN 
-    if(is(origin, "DNAString") && length(origin) > 0) {
+    if(ret.seq && length(origin) > 0) {
         typs = sapply(resthang$FEATURES, function(x) x$type[1])
         srcs = fill_stack_df(resthang$FEATURES[typs == "source"])
         ## dss = DNAStringSet(lapply(GRanges(ranges(srcs), function(x) origin[x])))
         dss = DNAStringSet(lapply(ranges(srcs), function(x) origin[x]))
         names(dss) = sapply(srcs,
                             function(x) as.character(seqnames(x)[1]))
-        if(seq.only)
+        if(!ret.anno)
             resthang = dss
         else
             resthang$ORIGIN = dss
-    } else if (seq.only) {
-        stop("Asked for seq.only from a file with no sequence information")
+    } else if (!ret.anno) { ##implies ret.seq is TRUE
+        stop("Asked for only sequence (ret.anno=FALSE) from a file with no sequence information")
     }
     af = proc.time()["elapsed"]
     if(verbose)
@@ -444,43 +474,51 @@ parseGenBank = function(file, text = readLines(file),  partial = NA,
     
 }
 
-##866 512 7453
 
 ## slightly specialized function to stack granges which may have different
 ## mcols together, filling with NA_character_ as needed.
 ## also collapses multiple db_xref notes into single CharacterList column and
 ## creates an AAStringSet for the translation field
 
+multivalfields = c("db_xref", "EC_number")
 
 fill_stack_df = function(dflist, cols, fill.logical = TRUE, sqinfo = NULL) {
     if(length(dflist) == 0)
         return(NULL)
-    if(length(dflist) > 1) {
+   # if(length(dflist) > 1) {
 
         allcols = unique(unlist(lapply(dflist, function(x) names(x))))
+        basenms = gsub("(.*)(\\.[[:digit:]]+)$", "\\1", allcols)
+        nmtab = table(basenms)
+        dupnms = names(nmtab[nmtab>1])
+        if(any(!dupnms %in% multivalfields))
+            warning("Got unexpected multi-value field(s) [ ",
+                    paste(setdiff(dupnms, multivalfields), collapse = ", "),
+                    " ]. The resulting column(s) will be of class CharacterList, rather than vector(s). Please contact the maintainer if multi-valuedness is expected/meaningful for the listed field(s).")
+        allcols = unique(basenms)
+        
         logcols = unique(unlist(lapply(dflist, function(x) names(x)[sapply(x, is.logical)])))
         charcols = setdiff(allcols, logcols)
-        dbxr = grep("db_xref", allcols)
-        if(length(dbxr) > 1) {
-            allcols = c(allcols[-dbxr], "db_xref")
-            mult_xref = TRUE
-        } else {
-            mult_xref = FALSE
-        }
         
         if(missing(cols))
             cols = allcols
         
-        
-        ## filled = lapply(grlist,
         filled = mapply(
             function(x, i) {
-            if(mult_xref) {
-                loc_dbxr = grep("db_xref", names(x))
-                rows = lapply(seq(along = rownames(x)),
-                              function(y) unlist(x[y,loc_dbxr]))
-                x = x[,-loc_dbxr]
-                x$db_xref = I(rows)
+            ## have to deal with arbitrary multiple columns
+            ## transform them into list columns
+            for(nm in dupnms) {
+                locs = grep(nm, names(x))
+                if(length(locs)) {
+                    rows = lapply(seq(along = rownames(x)),
+                                         function(y) unlist(x[y,locs]))
+                           
+                    x = x[,-locs]
+                } else {
+                    rows = list(character())
+                }
+
+                x[[nm]] = rows
             }
         
         
@@ -496,10 +534,15 @@ fill_stack_df = function(dflist, cols, fill.logical = TRUE, sqinfo = NULL) {
         }, x = dflist, i = seq(along = dflist), SIMPLIFY=FALSE)
  #   stk = do.call(rbind, c(filled, deparse.level=0, make.row.names=FALSE))
         stk = .simple_rbind_dataframe(filled, "temp")
-    } else {
-        stk = dflist[[1]]
-    }
+    ## } else {
+    ##     stk = dflist[[1]]
+    ## }
     stk[["temp"]] = NULL
+
+    listcols = which(sapply(names(stk),
+                            function(x) is(stk[[x]], "list") ||
+                                        x %in% multivalfields))
+    stk[listcols] = lapply(listcols, function(i) as(stk[[i]], "CharacterList"))
     mc = names(stk)[!names(stk) %in% c("seqnames", "start", "end", "strand")]
     if(fill.logical) {
         logcols = which(sapply(stk, is.logical))
@@ -511,7 +554,8 @@ fill_stack_df = function(dflist, cols, fill.logical = TRUE, sqinfo = NULL) {
     }
     grstk = GRanges(seqnames = stk$seqnames,
                     ranges = IRanges(start = stk$start, end = stk$end),
-                    strand = stk$strand ) ##, mcols = stk[,mc])
+                    strand = stk$strand )
+    
     ## this may be slightly slower, but specifying mcols during
     ## creation appends mcols. to all the column names, super annoying.
     mcols(grstk) = stk[,mc]
@@ -529,9 +573,6 @@ fill_stack_df = function(dflist, cols, fill.logical = TRUE, sqinfo = NULL) {
     if(!is.null(sqinfo))
         seqinfo(grstk) = sqinfo
     grstk
-
-
-
 }
 
 
@@ -627,10 +668,16 @@ make_varvr = function(rawvars, sq, sqinfo) {
         return(VRanges(seqinfo = sqinfo))
     if(is.null(sq)) {
         warning("importing variation features when origin sequence is not included in the file is not currently supported. Skipping ", length(rawvars), " variation features.")
+        return(VRanges(seqinfo = sqinfo))
     }
         
     vrs = fill_stack_df(rawvars, sqinfo = sqinfo)
     vrs$temp_grouping_id = NULL
+    ## not all variants have /replace so we can't assume that ANY of them
+    ## in a file have it (though  it is very likely at least one will)
+    ## if none of them do, the column won't exist at all
+    if(is.null(vrs$replace))
+        vrs$replace = NA_character_
     ## if(any(is.na(vrs$replace))) {
     ##     warning("Removing seemingly unspecified variation features (no /replace)")
     ##     vrs = vrs[!is.na(vrs$replace)]
@@ -639,9 +686,11 @@ make_varvr = function(rawvars, sq, sqinfo) {
     ## makeVRangesFromGRanges seems to have a bug(?) that requires the
     ## columns used dfor the VRanges core info to be the first 6 in the
     ## granges mcols
-    dels = nchar(vrs$replace) == 0L
-    vrs[dels] = resize(vrs[dels], width(vrs[dels]) + 1L, fix = "end")
-    vrs$replace[dels] = as.character(sq[resize(vrs[dels], 1L)])
+    dels = nchar(vrs$replace) == 0L & !is.na(vrs$replace)
+    if(length(dels)) {
+        vrs[dels] = resize(vrs[dels], width(vrs[dels]) + 1L, fix = "end")
+        vrs$replace[dels] = as.character(sq[resize(vrs[dels], 1L)])
+    }
     newcols = DataFrame( ref  = as.character(sq[vrs]),
                         alt = vrs$replace,
                         totalDepth = NA_integer_,
@@ -715,18 +764,16 @@ make_genegr = function(x, sqinfo) {
 
 ##' @importFrom GenomeInfoDb seqlevels seqinfo Seqinfo
 ##' @title GenBank object constructors
-##' @description Constructors for \code{GenBankFull} and
-##' \code{GenBankAnnot} objects.
+##' @description Constructors for \code{GenBankRecord} objects.
 ##' @rdname make_gbobjs
 ##' @param rawgbk list. The output of \code{parseGenBank}
 ##' @param verbose logical. Should informative messages be shown
-##' @return A GenBankAnnot (\code{make_gbannot}) or
-##' GenBankFull (\code{make_gbfull}) object.
+##' @return A GenBankRecord object
 ##' @examples
 ##' prsed = parseGenBank(system.file("sample.gbk", package="genbankr"))
-##' gb = make_gbannot(prsed)
+##' gb = make_gbrecord(prsed)
 ##' @export
-make_gbannot = function(rawgbk, verbose = FALSE) {
+make_gbrecord = function(rawgbk, verbose = FALSE) {
     bf = proc.time()["elapsed"]
     feats = rawgbk$FEATURES
     sq = rawgbk$ORIGIN
@@ -779,28 +826,21 @@ make_gbannot = function(rawgbk, verbose = FALSE) {
     if(is.null(ofeats))
         ofeats = GRanges()
     seqinfo(ofeats) = sqinfo
-    res = new("GenBankAnnot", genes = gns, cds = cdss, exons = exns,
+    res = new("GenBankRecord", genes = gns, cds = cdss, exons = exns,
               transcripts = txs, variations = vars,
               sources = fill_stack_df(feats[typs == "source"]),
               other_features = ofeats,
               accession = rawgbk$ACCESSION,
               version = rawgbk$VERSION,
               locus = rawgbk$LOCUS,
-              definition = rawgbk$DEFINITION)
+              definition = rawgbk$DEFINITION,
+              sequence = sq)
     af = proc.time()["elapsed"]
     if(verbose)
-        message(Sys.time(), " - Done creating GenBankAnnot object [ ", af - bf, " seconds ]") 
+        message(Sys.time(), " - Done creating GenBankRecord object [ ", af - bf, " seconds ]") 
     res
 }
     
-
-##' @rdname make_gbobjs
-##' @aliases make_gbfull
-##' @export
-make_gbfull = function(rawgbk, verbose = FALSE) {
-    gba = make_gbannot(rawgbk, verbose = verbose)
-    new("GenBankFull", annotations = gba, sequence = rawgbk$ORIGIN)
-}
 
 
 ## super fast rbind of data.frame lists from Pete Haverty
