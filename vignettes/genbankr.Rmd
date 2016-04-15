@@ -121,10 +121,10 @@ organism. We can call `getSeq` on a `GenBankFile` or `GBAccession` object
 getSeq(gbkfile)
 ```
 
-Additionally, we can specify `seq.only = TRUE` in `parseGenBank`
+Additionally, we can specify `ret.anno = FALSE` in `parseGenBank`
 
 ```{r}
-parseGenBank("sample.gbk", seq.only=TRUE)
+parseGenBank("sample.gbk", ret.anno=FALSE)
 ```
 
 

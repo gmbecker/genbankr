@@ -94,3 +94,35 @@ Changes in version 0.99.4
 BUGFIXES
 
      o Fix small documentation bugs to squash check warnings
+
+Changes in version 0.99.5
+-------------------------
+
+MAJOR USER VISIBLE CHANGES
+
+     o Move to single-class model with nullable sequence slot, class name 
+       changed to GenBankRecord. Removed methods, etc for old classes
+
+     o parseGenBank now accepts ret.anno and ret.seq to control whether the 
+       the sequence and annotations are parsed. 
+
+     o Change how repeated annotation fields within a single feature entry is
+       handled. Known multivalue fields (currently db_xref and EC_number) 
+       *always* return CharacterList. Others return CharacterList in case of 
+       duplicate entries only, with a warning.
+
+BUGFIXES
+	
+     o correctly support cases where arbitrary annotations appear more than once
+       within a single feature. 
+
+     o fix regression problem with handling GenBank files with no sequence
+       information when ret.seq is TRUE
+
+     o fix problem where tests weren't being invoked properly during check
+
+     o More informative error message when non-existent filename is passed to 
+       readGenBank or parseGenBank.
+
+     o Fix bug when *all* variation features in a file lack /replace (for
+       VRanges alt is a mandatory field).

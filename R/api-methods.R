@@ -14,7 +14,7 @@ NULL
 ##' @param ... unused.
 ##' @docType methods
 ##' @rdname api-methods
-##' @aliases cds,GenBankAnnot-method
+##' @aliases cds,GenBankRecord-method
 ##' @importMethodsFrom GenomicFeatures cds
 ##' @examples
 ##' gb = readGenBank(system.file("sample.gbk", package="genbankr"))
@@ -22,99 +22,50 @@ NULL
 ##' exons(gb)
 ##' genes(gb)
 ##' @return The expected types, \code{GenomicRanges} for most functions,
-##' a \code{DNAStrimgSet} for \code{getSeq}, a \code{GenBankAnnot} for
-##' \code{annotations}.
+##' a \code{DNAStrimgSet} for \code{getSeq}
 ##' @export
-setMethod("cds", "GenBankAnnot",
+setMethod("cds", "GenBankRecord",
           function(x) x@cds)
 
 ##' @docType methods
 ##' @rdname api-methods
-##' @aliases exons,GenBankAnnot-method
+##' @aliases exons,GenBankRecord-method
 ##' @importMethodsFrom GenomicFeatures exons
 ##' @export
-setMethod("exons", "GenBankAnnot",
+setMethod("exons", "GenBankRecord",
           function(x) x@exons)
 
 ##' @docType methods
 ##' @rdname api-methods
-##' @aliases genes,GenBankAnnot-method
+##' @aliases genes,GenBankRecord-method
 ##' @importMethodsFrom GenomicFeatures genes
 ##' @export
-setMethod("genes", "GenBankAnnot",
+setMethod("genes", "GenBankRecord",
           function(x) x@genes)
 
 ##' @docType methods
 ##' @rdname api-methods
-##' @aliases transcripts,GenBankAnnot-method
+##' @aliases transcripts,GenBankRecord-method
 ##' @importMethodsFrom GenomicFeatures transcripts
 ##' @export
-setMethod("transcripts", "GenBankAnnot",
+setMethod("transcripts", "GenBankRecord",
           function(x) x@transcripts)
 
+##' @importMethodsFrom Biostrings getSeq
 ##' @docType methods
 ##' @rdname api-methods
-##' @aliases cds,GenBankFull-method
+##' @aliases getSeq,GenBankRecord-method
 ##' @export
-setMethod("cds", "GenBankFull",
-          function(x) cds(annotations(x)))
-
-##' @docType methods
-##' @rdname api-methods
-##' @aliases exons,GenBankFull-method
-##' @export
-setMethod("exons", "GenBankFull",
-          function(x) exons(annotations(x)))
-
-##' @docType methods
-##' @rdname api-methods
-##' @aliases genes,GenBankFull-method
-##' @export
-setMethod("genes", "GenBankFull",
-          function(x) genes(annotations(x)))
-
-##' @docType methods
-##' @rdname api-methods
-##' @aliases transcripts,GenBankFull-method
-##' @export
-setMethod("transcripts", "GenBankFull",
-          function(x) transcripts(annotations(x)))
-
-
-##' @docType methods
-##' @rdname api-methods
-##' @export
-setGeneric("annotations", function(x) standardGeneric("annotations"))
-##' @docType methods
-##' @rdname api-methods
-##' @aliases annotations,GenBankFull-method
-##' @export
-setMethod("annotations", "GenBankFull",
-          function(x) x@annotations)
-
-
-
-##' @docType methods
-##' @rdname api-methods
-##' @aliases getSeq,GenBankFull-method
-##' @importMethodsFrom BSgenome getSeq
-##' @export
-setMethod("getSeq", "GenBankFull",
+setMethod("getSeq", "GenBankRecord",
           function(x, ...) x@sequence)
 
-##' @docType methods
-##' @rdname api-methods
-##' @aliases getSeq,GenBankAnnot-method
-##' @export
-setMethod("getSeq", "GenBankAnnot",
-          function(x, ...) stop("This object only contains annotation, no raw sequence is available"))
 
 ##' @docType methods
 ##' @rdname api-methods
 ##' @aliases getSeq,GenBankFile-method
 ##' @export
 setMethod("getSeq", "GenBankFile",
-          function(x, ...) parseGenBank(file = x@resource, seq.only = TRUE, ...))
+          function(x, ...) parseGenBank(file = x@resource, ret.anno=FALSE, ...))
 
 ##' @docType methods
 ##' @rdname api-methods
@@ -123,14 +74,8 @@ setMethod("getSeq", "GenBankFile",
 setMethod("getSeq", "GBAccession",
           function(x, ...) {
     txt = .getGBfromNuccore(x)
-    parseGenBank(text=txt, seq.only = TRUE, ...)
+    parseGenBank(text=txt, ret.anno = FALSE, ...)
 })
-
-
-
-
-
-
 
 
 ##' @docType methods
@@ -153,17 +98,10 @@ setGeneric("accession", function(x, ...) standardGeneric("accession"))
 
 ##' @docType methods
 ##' @rdname gbk-api
-##' @aliases accession,GenBankAnnot
+##' @aliases accession,GenBankRecord
 ##' @export
-setMethod("accession", "GenBankAnnot",
+setMethod("accession", "GenBankRecord",
           function(x) x@accession)
-
-##' @docType methods
-##' @rdname gbk-api
-##' @aliases accession,GenBankFull
-##' @export
-setMethod("accession", "GenBankFull",
-          function(x) accession(annotations(x)))
 
 ##' @docType methods
 ##' @title GenBank-annotation specific api methods
@@ -174,25 +112,37 @@ setGeneric("vers", function(x, ...) standardGeneric("vers"))
 
 ##' @docType methods
 ##' @rdname gbk-api
-##' @aliases vers,GenBankAnnot
+##' @aliases vers,GenBankRecord
 ##' @export
-setMethod("vers", "GenBankAnnot",
+setMethod("vers", "GenBankRecord",
           function(x) x@version)
+
+
+
+##' @docType methods
+##' @title GenBank-annotation specific api methods
+##' @rdname gbk-api
+##' @aliases sources
+##' @export
+setGeneric("sources", function(x, ...) standardGeneric("sources"))
 
 ##' @docType methods
 ##' @rdname gbk-api
-##' @aliases vers,GenBankFull
+##' @aliases sources,GenBankRecord
 ##' @export
-setMethod("vers", "GenBankFull",
-          function(x) vers(annotations(x)))
+setMethod("sources", "GenBankRecord",
+          function(x) x@sources)
+
+
+
 
 ##' @docType methods
 ##' @importMethodsFrom GenomicFeatures cdsBy
-##' @aliases cdsBy,GenBankAnnot
+##' @aliases cdsBy,GenBankRecord
 ##' @param by character. Factor to group the resulting GRanges by.
 ##' @rdname api-methods
 ##' @export
-setMethod("cdsBy", "GenBankAnnot",
+setMethod("cdsBy", "GenBankRecord",
           function(x, by = c("tx", "gene")) {
     by = match.arg(by)
     if(by == "tx")
@@ -204,9 +154,9 @@ setMethod("cdsBy", "GenBankAnnot",
 ##' @docType methods
 ##' @rdname api-methods
 ##' @importMethodsFrom GenomicFeatures exonsBy
-##' @aliases exonsBy,GenBankAnnot
+##' @aliases exonsBy,GenBankRecord
 ##' @export              
-setMethod("exonsBy", "GenBankAnnot",
+setMethod("exonsBy", "GenBankRecord",
           function(x, by = c("tx", "gene")) {
     by = match.arg(by)
     if(by == "tx")
@@ -214,20 +164,6 @@ setMethod("exonsBy", "GenBankAnnot",
     else
         split(exons(x), exons(x)$gene_id)
 })
-
-##' @docType methods
-##' @rdname api-methods
-##' @aliases cdsBy,GenBankFull
-##' @export
-setMethod("cdsBy", "GenBankFull",
-          function(x, by = c("tx", "gene")) cdsBy(annotations(x), by = by)) 
-##' @docType methods
-##' @rdname api-methods
-##' @aliases exonsBy,GenBankFull
-##' @export
-setMethod("exonsBy", "GenBankFull",
-          function(x, by = c("tx", "gene")) exonsBy(annotations(x), by = by)) 
-
 
 
 setMethod(showAsCell, "XStringSet", function(object) {
@@ -244,18 +180,12 @@ setMethod(showAsCell, "XStringSet", function(object) {
 })
 
 
-setMethod(show, "GenBankAnnot",
+setMethod(show, "GenBankRecord",
           function(object) {
     cat("GenBank Annotations\n")
     .genbanksum(object)
 })
 
-
-setMethod(show, "GenBankFull",
-          function(object) {
-    cat("GenBank Annotations with Raw Sequence\n")
-    .genbanksum(annotations(object))
-})
 
 setMethod(show, "GBAccession",
           function(object) {
@@ -285,30 +215,18 @@ setMethod(show, "GBAccession",
 
 ##' @importMethodsFrom GenomeInfoDb isCircular
 ##' @rdname api-methods
-##' @aliases isCircular,GenBankAnnot
+##' @aliases isCircular,GenBankRecord
 ##' @export
-setMethod("isCircular", "GenBankAnnot",
+setMethod("isCircular", "GenBankRecord",
           function(x) grepl("circular", x@locus))
 
 
-##' @rdname api-methods
-##' @aliases isCircular,GenBankFull
-##' @export
-setMethod("isCircular", "GenBankFull",
-          function(x) isCircular(annotations(x)))
-
 ##' @importMethodsFrom GenomeInfoDb seqinfo
 ##' @rdname api-methods
-##' @aliases seqinfo,GenBankAnnot
+##' @aliases seqinfo,GenBankRecord
 ##' @export
-setMethod("seqinfo", "GenBankAnnot",
+setMethod("seqinfo", "GenBankRecord",
           function(x) seqinfo(genes(x)))
-
-##' @rdname api-methods
-##' @aliases seqinfo,GenBankFull
-##' @export
-setMethod("seqinfo", "GenBankFull",
-          function(x) seqinfo(genes(annotations(x))))
 
 ##' @importMethodsFrom rtracklayer import
 ##' @importFrom rtracklayer resource
@@ -320,7 +238,7 @@ setMethod("seqinfo", "GenBankFull",
 ##' @param text See import docs.
 ##' @param ... Arguments passed to \code{readGenBank}
 ##' @aliases import,GenBankFile
-##' @return A \code{GenBankFull} or \code{GenBankAnnot} object.
+##' @return A \code{GenBankRecord} object.
 ##' @rdname import
 ##' @export
 setMethod("import", "GenBankFile",
@@ -348,15 +266,15 @@ GenBankFile = function(fil) new("GenBankFile", resource = fil)
 ##' @docType methods
 ##' @rdname intergenic
 ##' @name intergenic
-##' @param x A GenBankAnnot or GenBankFull object
+##' @param x A GenBankRecord object
 ##' @return A GRanges for the intergenic regions, defined as regions not
 ##' overlapping any genes defined in the annotations on either strand.
 ##' @examples
 ##' gb = readGenBank(system.file("sample.gbk", package="genbankr"))
 ##' intergenic(gb)
-##' @aliases intergenic,GenBankAnnot-method
+##' @aliases intergenic,GenBankRecord-method
 ##' @export
-setMethod("intergenic", "GenBankAnnot",
+setMethod("intergenic", "GenBankRecord",
           function(x) {
     gns = genes(x)
     strand(gns) = "*"
@@ -383,24 +301,14 @@ setMethod("intergenic", "GenBankAnnot",
 })
 
 
-##' @rdname intergenic
-##' @docType methods
-##' @aliases intergenic,GenBankFull-method
-##' @return A \code{GRanges} object
-##' @export
-setMethod("intergenic", "GenBankFull",
-          function(x) {
-    intergenic(annotations(x))
-})
-
 
 ##' @title Retrieve variantion features
 ##' 
-##' @description Extract the annotated variants from a GenBankAnnot or GenBankFull object
+##' @description Extract the annotated variants from a GenBankRecord object
 ##' 
 ##' @rdname variants
 ##' @docType methods
-##' @param x a GenBankAnnot or GenBankFull object
+##' @param x a GenBankRecord object
 ##' @return A VRanges containing the variations annotated in the source file
 ##' @examples
 ##' gb = readGenBank(system.file("sample.gbk", package="genbankr"))
@@ -409,15 +317,9 @@ setMethod("intergenic", "GenBankFull",
 setGeneric("variants", function(x) standardGeneric("variants"))
 
 ##' @rdname variants
-##' @aliases variants,GenBankAnnot
+##' @aliases variants,GenBankRecord
 ##' @export
-setMethod("variants", "GenBankAnnot", function(x) x@variations)
-
-##' @rdname variants
-##' @aliases variants,GenBankFull
-##' @export
-setMethod("variants", "GenBankFull", function(x) annotations(x)@variations)
-    
+setMethod("variants", "GenBankRecord", function(x) x@variations)
 
 ##' @title Retrieve 'other' features
 ##'
@@ -425,7 +327,7 @@ setMethod("variants", "GenBankFull", function(x) annotations(x)@variations)
 ##' from the set of annotations
 ##' @rdname otherFeatures
 ##' @docType methods
-##' @param x a GenBankAnnot or GenBankFull object
+##' @param x a GenBankRecord object
 ##' @return A GRanges containing the features which don't fall into another
 ##' category (ie not gene, exon, transcript, cds, or variant) annotated in the
 ##' source file
@@ -436,12 +338,13 @@ setMethod("variants", "GenBankFull", function(x) annotations(x)@variations)
 setGeneric("otherFeatures", function(x) standardGeneric("otherFeatures"))
 
 ##' @rdname otherFeatures
-##' @aliases otherFeatures,GenBankAnnot
+##' @aliases otherFeatures,GenBankRecord
 ##' @export
-setMethod("otherFeatures", "GenBankAnnot", function(x) x@other_features)
+setMethod("otherFeatures", "GenBankRecord", function(x) x@other_features)
 
-##' @rdname otherFeatures
-##' @aliases otherFeatures,GenBankFull
-##' @export
-setMethod("otherFeatures", "GenBankFull", function(x)
-    annotations(x)@other_features)
+
+setGeneric("sequence<-", function(x, value) standardGeneric("sequence<-"))
+setMethod("sequence<-", "GenBankRecord", function(x, value) {
+    x@sequence = value
+    x
+})
