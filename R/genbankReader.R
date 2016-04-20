@@ -357,14 +357,20 @@ readFeatures = function(lines, partial = NA, verbose = FALSE,
     
 }
 
-readOrigin = function(lines) {
+
+## seqtype: bp = base pairs (DNA/RNA), aa = amino acids (peptides/protein)
+readOrigin = function(lines, seqtype = "bp") {
     ## strip spacing and line numbering
     regex = "([[:space:]]+|[[:digit:]]+|//)"
     
     dnachar = gsub(regex, "", lines[-1])
-    if(any(nzchar(dnachar)))
-        DNAString(paste(dnachar, collapse=""))
-    else
+    chars = paste(dnachar, collapse="")
+    if(any(nzchar(dnachar))) {
+        switch(seqtype,
+               bp = DNAString(chars),
+               aa = AAString(chars),
+               stop("Unknown origin sequence type: ", seqtype))
+    } else
         NULL
 }
 
@@ -377,6 +383,14 @@ fastwriteread = function(txtline) {
     
 }
 
+
+
+##LOCUS       ABD64816                1353 aa            linear   INV 12-MAR-2006
+.seqTypeFromLocus = function(locus) {
+    gsub("^[[:space:]]*LOCUS[[:space:]]+[[:alnum:]]+[[:space:]]+[[:digit:]]+[[:space:]]+([^[:space:]]+).*",
+         "\\1",
+         locus)
+}
 
 
 ## substr is faster than grep for looking at beginning of strings
@@ -426,23 +440,27 @@ parseGenBank = function(file, text = readLines(file),  partial = NA,
     fldnames = gsub("^([[:upper:]]+).*", "\\1", text[fldlines])[fldfac]
     
     spl = split(text, fldnames)
-    
-    resthang = list(FEATURES = readFeatures(spl[["FEATURES"]],
-                                            source.only=!ret.anno))
 
-    resthang$ORIGIN = if(ret.seq) readOrigin(spl[["ORIGIN"]]) else NULL
+    resthang = list(LOCUS = readLocus(spl[["LOCUS"]]))
+    resthang[["FEATURES"]] = readFeatures(spl[["FEATURES"]],
+                                          source.only=!ret.anno,
+                                          partial = partial)
+    seqtype = .seqTypeFromLocus(resthang$LOCUS)
+    resthang$ORIGIN = if(ret.seq)
+                          readOrigin(spl[["ORIGIN"]],
+                                     seqtype = seqtype)
+                      else NULL
     
     if(ret.anno) {
         resthang2 = mapply(function(field, lines, verbose) {
             switch(field,
-                   LOCUS = readLocus(lines),
                    DEFINITION = readDefinition(lines),
                    ACCESSION = readAccession(lines),
                    VERSION = readVersions(lines),
                    KEYWORDS = readKeywords(lines),
                    SOURCE = readSource(lines),
-                   ## don't read FEATURES or ORIGIN because they are already
-                   ## in resthang from above
+                   ## don't read FEATURES, ORIGIN, or LOCUS because they are
+                   ## already in resthang from above
                    NULL)
         }, lines = spl, field = names(spl), SIMPLIFY=FALSE, verbose = verbose)
         resthang2$FEATURES = resthang2$FEATURES[sapply(resthang2$FEATURES,
@@ -453,10 +471,15 @@ parseGenBank = function(file, text = readLines(file),  partial = NA,
     ##DNAString to DNAStringSet
     origin = resthang$ORIGIN 
     if(ret.seq && length(origin) > 0) {
+        
         typs = sapply(resthang$FEATURES, function(x) x$type[1])
         srcs = fill_stack_df(resthang$FEATURES[typs == "source"])
         ## dss = DNAStringSet(lapply(GRanges(ranges(srcs), function(x) origin[x])))
-        dss = DNAStringSet(lapply(ranges(srcs), function(x) origin[x]))
+        dss = switch(seqtype,
+                     bp = DNAStringSet(lapply(ranges(srcs), function(x) origin[x])),
+                     aa = AAStringSet(lapply(ranges(srcs), function(x) origin[x])),
+                     stop("Unrecognized origin sequence type: ", seqtype)
+                     )
         names(dss) = sapply(srcs,
                             function(x) as.character(seqnames(x)[1]))
         if(!ret.anno)
@@ -652,9 +675,9 @@ make_txgr = function(rawtxs, exons, sqinfo) {
         message("No transcript features (mRNA) found, using spans of CDSs")
         spl = split(exons, exons$transcript_id)
         txslst = range(spl)
-        
+        mcdf = mcols(unlist(phead(spl, 1)))
         txs = unlist(txslst, use.names=FALSE)
-        txs$gene_id = mcols(phead(spl, 1))$gene_id
+        mcols(txs) = mcdf
         seqinfo(txs) = sqinfo
     }
     txs

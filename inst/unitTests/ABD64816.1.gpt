@@ -1,0 +1,159 @@
+LOCUS       ABD64816                1353 aa            linear   INV 12-MAR-2006
+DEFINITION  Egfr, partial [Drosophila virilis].
+ACCESSION   ABD64816
+VERSION     ABD64816.1  GI:89243303
+DBSOURCE    accession DQ378290.1
+KEYWORDS    .
+SOURCE      Drosophila virilis
+  ORGANISM  Drosophila virilis
+            Eukaryota; Metazoa; Ecdysozoa; Arthropoda; Hexapoda; Insecta;
+            Pterygota; Neoptera; Endopterygota; Diptera; Brachycera;
+            Muscomorpha; Ephydroidea; Drosophilidae; Drosophila.
+REFERENCE   1  (residues 1 to 1353)
+  AUTHORS   Slawson,E.E., Shaffer,C.D., Malone,C.D., Leung,W., Kellmann,E.,
+            Shevchek,R.B., Craig,C.A., Bloom,S.M., Bogenpohl,J. II, Dee,J.,
+            Morimoto,E.T., Myoung,J., Nett,A.S., Ozsolak,F., Tittiger,M.E.,
+            Zeug,A., Pardue,M.L., Buhler,J., Mardis,E.R. and Elgin,S.C.
+  TITLE     Comparison of dot chromosome sequences from D. melanogaster and D.
+            virilis reveals an enrichment of DNA transposon sequences in
+            heterochromatic domains
+  JOURNAL   Genome Biol. 7 (2), R15 (2006)
+   PUBMED   16507169
+REFERENCE   2  (residues 1 to 1353)
+  AUTHORS   Slawson,E.E., Shaffer,C.D., Malone,C.D., Leung,W., Kellmann,E.,
+            Shevchek,R.B., Craig,C.A., Bloom,S.M., Bogenpohl,J. II, Dee,J.,
+            Morimoto,E.T.A., Myoung,J., Nett,A.S., Ozsolak,F., Tittiger,M.E.,
+            Zeug,A., Pardue,M.-L., Buhler,J., Mardis,E.R. and Elgin,S.C.R.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (25-JAN-2006) Biology Department, Washington University,
+            One Brookings Drive, St. Louis, MO 63130, USA
+COMMENT     Method: conceptual translation supplied by author.
+FEATURES             Location/Qualifiers
+     source          1..1353
+                     /organism="Drosophila virilis"
+                     /strain="Tucson 15010-1001.10"
+                     /db_xref="taxon:7244"
+                     /clone="fosmid 10J19"
+                     /clone_lib="fosmids from BACPAC Center at CHORI"
+                     /note="contig 112; part of a major chromosome; not
+                     chromosome 4"
+     Protein         <1..1353
+                     /product="Egfr"
+                     /name="Dvir_CG10079"
+     Region          27..138
+                     /region_name="Recep_L_domain"
+                     /note="Receptor L domain; pfam01030"
+                     /db_xref="CDD:250307"
+     Region          156..304
+                     /region_name="Furin-like"
+                     /note="Furin-like cysteine rich region; pfam00757"
+                     /db_xref="CDD:250112"
+     Region          203..246
+                     /region_name="FU"
+                     /note="Furin-like repeats. Cysteine rich region. Exact
+                     function of the domain is not known. Furin is a
+                     serine-kinase dependent proprotein processor. Other
+                     members of this family include endoproteases and cell
+                     surface receptors; cd00064"
+                     /db_xref="CDD:238021"
+     Region          320..446
+                     /region_name="Recep_L_domain"
+                     /note="Receptor L domain; pfam01030"
+                     /db_xref="CDD:250307"
+     Region          473..585
+                     /region_name="GF_recep_IV"
+                     /note="Growth factor receptor domain IV; pfam14843"
+                     /db_xref="CDD:258980"
+     Region          474..522
+                     /region_name="FU"
+                     /note="Furin-like repeats. Cysteine rich region. Exact
+                     function of the domain is not known. Furin is a
+                     serine-kinase dependent proprotein processor. Other
+                     members of this family include endoproteases and cell
+                     surface receptors; cd00064"
+                     /db_xref="CDD:238021"
+     Region          523..570
+                     /region_name="FU"
+                     /note="Furin-like repeats. Cysteine rich region. Exact
+                     function of the domain is not known. Furin is a
+                     serine-kinase dependent proprotein processor. Other
+                     members of this family include endoproteases and cell
+                     surface receptors; cd00064"
+                     /db_xref="CDD:238021"
+     Region          640..687
+                     /region_name="FU"
+                     /note="Furin-like repeats. Cysteine rich region. Exact
+                     function of the domain is not known. Furin is a
+                     serine-kinase dependent proprotein processor. Other
+                     members of this family include endoproteases and cell
+                     surface receptors; cd00064"
+                     /db_xref="CDD:238021"
+     Region          689..>734
+                     /region_name="FU"
+                     /note="Furin-like repeats. Cysteine rich region. Exact
+                     function of the domain is not known. Furin is a
+                     serine-kinase dependent proprotein processor. Other
+                     members of this family include endoproteases and cell
+                     surface receptors; cd00064"
+                     /db_xref="CDD:238021"
+     Region          829..1107
+                     /region_name="PTKc_EGFR_like"
+                     /note="Catalytic domain of Epidermal Growth Factor
+                     Receptor-like Protein Tyrosine Kinases; cd05057"
+                     /db_xref="CDD:270648"
+     Region          837..1093
+                     /region_name="Pkinase_Tyr"
+                     /note="Protein tyrosine kinase; pfam07714"
+                     /db_xref="CDD:254379"
+     Site            order(843..844,847..848,870,916,918,922,966..967,980,
+                     1001..1005,1010,1014)
+                     /site_type="active"
+                     /db_xref="CDD:270648"
+     Site            order(843..844,851,868,870,891,915..916,918,966..967,969,
+                     980)
+                     /site_type="other"
+                     /note="ATP binding site [chemical binding]"
+                     /db_xref="CDD:270648"
+     Site            979..1004
+                     /site_type="other"
+                     /note="activation loop (A-loop)"
+                     /db_xref="CDD:270648"
+     Site            order(1001..1005,1010,1014)
+                     /site_type="other"
+                     /note="polypeptide substrate binding site [polypeptide
+                     binding]"
+                     /db_xref="CDD:270648"
+     CDS             1..1353
+                     /gene="Egfr"
+                     /locus_tag="EDV_Mg0013"
+                     /gene_synonym="Dvir\CG10079"
+                     /coded_by="complement(join(DQ378290.1:21315..23841,
+                     DQ378290.1:23907..24039,DQ378290.1:24104..25284,
+                     DQ378290.1:25364..>25586))"
+                     /codon_start=3
+ORIGIN      
+        1 cigtksrlsv psnrdhhyrn lrdrytncty vdgnleltwl qdpnldlsfl anirevtgyi
+       61 lishvdvtkv ifpklqiirg rtlfsltvde akyalfaays kmntlempel rdilqgwvgf
+      121 fsnynlchtr sivwreilsg vndhynytyn ftaeertcpk cdpscergac wgegphncqk
+      181 fskincapqc aqgrcfgqgp rdcchlfcag gctgptqkdc iacknffddg vckeecppmr
+      241 kynptnyele anpegkyayg atcvrecpgh llkdngacvr scpsdkmakd gecvacngpc
+      301 pktcpgvpvl nsgnidsfkn ctviegnirv ldqtfsgyqd insnytmgar yipmhpdrle
+      361 vfstvkeitg ylniegvhqh fknlsyfrnl evihgrqlme sffaalsivk sslsslelrn
+      421 lkrinsgsiv iqhneklcyv snirwstvqk sndqmqyine nlntsecrka rqvcsdqcns
+      481 dgcwgagpdq clncksfnyn gtciadcrnv tktyqfdakt ckkchpecrt csgpgaehcd
+      541 ecvhvrddqh cvtvcpenky sdfgicrrch etcegctgpn ntighgacnt cnlaiinada
+      601 tverclrkdd kcpdgyywey vhpqeqgslk plagkaicrk chprcelctn ygfheqvcsk
+      661 cagykrreqc edecpadhya deekrecfec hpeckgctgp gsedclacrn fklfaesevy
+      721 dnstlfncts kcppelphvn yqshfigphc asspprgskl taglnvnmii iifvavfipv
+      781 icvlcviiyi crqkqqekke tddlakvffg cedseplrps niganlsklr ivkdaelrkg
+      841 gvlgmgafgr vykgvwvpeg envkipvaik ellktsgaes sqeflneaya matvehgnll
+      901 kllavcmssq mmlitqlmpl gclldyvrnn rdkigskall nwstqiakgm syleerrlvh
+      961 rdlaarnvlv qtpslvkitd fglakllsld sneykaaggk mpikwlalec irhrvfssks
+     1021 dvwafgvtiw elltfgqrph enilakdipd liemglkleq peicsldiyc tllscwqlda
+     1081 dlrppfkqlt nvfaefardp grylaipgdk ftrlpaytsq dekdlirkla pttdgsepmv
+     1141 eaddylqpka apgpshrtdg tdeipklnry ckdpsnknsn sggiggddet dsnarevgvg
+     1201 nlrldlpvde ddylmptgqg npngnnnnnn nnsnnpnnnm ataaatgyid vigvskrwey
+     1261 ikqantnpil alshnqvpvs vdnpeyllna lsageapmpt qtigipvagv pgtmevkmpg
+     1321 sestssdhey yndtqrelqp lqllrsrste trv
+//
+

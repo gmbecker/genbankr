@@ -48,3 +48,26 @@ test_getSeq = function() {
 }
     
     
+test_genpept = function() {
+    fil = system.file("unitTests/ABD64816.1.gpt", package="genbankr")
+    res1 = readGenBank(fil)
+    checkTrue(is(getSeq(res1), "AAStringSet"), "Checking that sequence is returned as AAStringSet when given genpept file")
+}
+
+test_partial = function() {
+    fil = system.file("unitTests/partial.gbk", package="genbankr")
+    res1 = readGenBank(fil)
+
+    res2 = readGenBank(fil, partial=FALSE)
+    checkIdentical(res1, res2, "Checking that partial=NA and partial=FALSE result in the same object")
+    
+    res3 = readGenBank(fil, partial=TRUE)
+    checkTrue(length(genes(res3)) == 1, "Checking that partial=TRUE retains a partial feature")
+}
+
+test_txdb = function() {
+    thing = readGenBank(system.file("unitTests/compjoin.gbk", package="genbankr"))
+    tx = makeTxDbFromGenBank(thing)
+
+
+}

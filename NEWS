@@ -126,3 +126,17 @@ BUGFIXES
 
      o Fix bug when *all* variation features in a file lack /replace (for
        VRanges alt is a mandatory field).
+
+Changes in version 0.99.6
+-------------------------
+
+USER VISIBLE CHANGES
+
+     o Added support for creating of TxDb objects from GenBankRecord objects
+
+     o Added support for genpept files to readGenBank and parseGenBank
+
+BUGFIXES
+
+     o Fix bug where partial was not being passed down correctly when specified
+       in readGenBank call.

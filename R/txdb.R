@@ -1,0 +1,120 @@
+##' @importFrom GenomicFeatures makeTxDb
+##' @importFrom GenomeInfoDb genome seqlengths isCircular
+
+##' @title Create a TxDb from a GenBank record
+##'
+##' @description Create a TxDb object from a GenBankRecord.
+##' @param gbr A GenBankRecord or GBAccession object
+##' @param reassign.ids logical. Passed down to \code{makeTxDb}
+##' @return A TxDb object
+##' @rdname txdb
+##' @docType methods
+##' @examples
+##' thing = readGenBank(system.file("unitTests/compjoin.gbk", package="genbankr"))
+##' tx = makeTxDbFromGenBank(thing)
+##' @export
+setGeneric("makeTxDbFromGenBank", function(gbr, reassign.ids = FALSE) standardGeneric("makeTxDbFromGenBank"))
+
+
+.chartxidToInt = function(charids, txcharids = charids) {
+    txfac = factor(txcharids)
+    if(!missing(txcharids))
+        as.integer(factor(charids, levels = levels(txfac)))
+    else
+        as.integer(txfac)
+    
+}
+
+##' @docType methods
+##' @rdname txdb
+##' @aliases makeTxDbFromGenBank,GenBankRecord
+##' @export
+##' 
+setMethod("makeTxDbFromGenBank", "GenBankRecord",
+          function(gbr, reassign.ids = FALSE) {
+    txgr = transcripts(gbr)
+    txdf = data.frame(tx_id = .chartxidToInt(txgr$transcript_id),
+                      tx_name = txgr$transcript_id,
+                      tx_chrom = as.character(seqnames(txgr)),
+                      tx_strand = as.character(strand(txgr)),
+                      tx_start = start(txgr),
+                      tx_end = end(txgr),
+                      stringsAsFactors=FALSE)
+
+    cdsgr = cds(gbr)
+    ##otherwise the exonrank calc below doesn't come out
+    ## in the right order!
+    cdsgr = cdsgr[order(cdsgr$transcript_id)]
+    cdspl = split(cdsgr, cdsgr$transcript_id)
+    grouplens = lengths(cdspl)
+    justfirstspl = phead(cdspl, 1)
+    strnd = as.character(strand(unlist(justfirstspl)))
+
+    ## beware of order here. the split sorts the factors! that's why
+    ## we had to sort cdsgr above.
+    exonrank = unlist(mapply(function(len, str) {
+        ret = seq(length.out=len)
+        if(str=="-")
+            ret = rev(ret)
+        ret
+    }, len = grouplens, str = strnd, SIMPLIFY=FALSE))
+
+    ## assertion to ensure order is correct to protect against silently garbage
+    ## results
+    ## duplicate names get 123 added to them, so asdf.1 turns into asdf.11
+    ## asdf.12, etc
+    stopifnot(identical(substr(names(exonrank),1, nchar(cdsgr$transcript_id)),
+                        cdsgr$transcript_id))
+    splicedf = data.frame(tx_id = .chartxidToInt(cdsgr$transcript_id, txgr$transcript_id),
+                          exon_rank = exonrank,
+                          exon_strand = as.character(strand(cdsgr)),
+                          exon_start = start(cdsgr),
+                          exon_end = end(cdsgr),
+                          cds_start = start(cdsgr),
+                          cds_end = end(cdsgr),
+                          cds_id = seq(along = end(cdsgr)),
+                          stringsAsFactors=FALSE)
+    
+    
+    ## technically there can be more than one gene associated with
+    ## a transcript (CDS), but we're nto supporting that here.
+    ## I don't even know what that would look like in a GenBank file
+    ## XXX revisit if necessary.
+    genedf = data.frame(tx_id = as.integer(factor(txgr$transcript_id)),
+                        gene_id = as.character(txgr$gene_id),
+                        stringsAsFactors=FALSE)
+
+    mdatvals = c(vers(gbr), genome(txgr), "NCBI (GenBank)",
+                  definition(gbr))
+    mdatnames = c(names(vers(gbr)), "genome", "source", 
+                  "definition")
+    metadat = data.frame(name = mdatnames, value = mdatvals, stringsAsFactors=FALSE)
+    sqinf = seqinfo(txgr)
+    sqinfodf = data.frame(chrom = seqnames(sqinf),
+                          length = seqlengths(sqinf),
+                          is_circular = isCircular(sqinf))
+    sqinfodf$chrom = rownames(sqinfodf)
+    sqinfodf$genome = NULL
+
+    makeTxDb(transcripts = txdf, splicings = splicedf,
+             genes = genedf, chrominfo = sqinfodf,
+             metadata = metadat,
+             reassign.ids = reassign.ids)
+})
+
+##' @docType methods
+##' @rdname txdb
+##' @aliases makeTxDbFromGenBank,GBAccession
+##' @export
+setMethod("makeTxDbFromGenBank", "GBAccession",
+          function(gbr, reassign.ids = FALSE) {
+
+    gb = readGenBank(gbr)
+    makeTxDbFromGenBank(gb, reassign.ids = reassign.ids)
+})
+
+    
+
+
+
+
