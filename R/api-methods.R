@@ -103,6 +103,40 @@ setGeneric("accession", function(x, ...) standardGeneric("accession"))
 setMethod("accession", "GenBankRecord",
           function(x) x@accession)
 
+
+
+##' @docType methods
+##' @rdname gbk-api
+##' @aliases definition
+##' @export
+setGeneric("definition", function(x, ...) standardGeneric("definition"))
+
+##' @docType methods
+##' @rdname gbk-api
+##' @aliases definition,GenBankRecord
+##' @export
+setMethod("definition", "GenBankRecord",
+          function(x) x@definition)
+
+
+##' @docType methods
+##' @rdname gbk-api
+##' @aliases locus
+##' @export
+setGeneric("locus", function(x, ...) standardGeneric("locus"))
+
+##' @docType methods
+##' @rdname gbk-api
+##' @aliases locus,GenBankRecord
+##' @export
+setMethod("locus", "GenBankRecord",
+          function(x) x@locus)
+
+
+
+
+
+
 ##' @docType methods
 ##' @title GenBank-annotation specific api methods
 ##' @rdname gbk-api

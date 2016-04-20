@@ -1,0 +1,58 @@
+LOCUS       GU179289              235233 bp    DNA     linear   VRL 09-MAY-2013
+DEFINITION  Human herpesvirus 5 strain VR1814, complete genome.
+ACCESSION   GU179289
+VERSION     GU179289.1  GI:270355759
+KEYWORDS    .
+SOURCE      Human herpesvirus 5 (HHV-5)
+  ORGANISM  Human herpesvirus 5
+            Viruses; dsDNA viruses, no RNA stage; Herpesvirales; Herpesviridae;
+            Betaherpesvirinae; Cytomegalovirus.
+REFERENCE   1  (bases 1 to 235233)
+  AUTHORS   Dargan,D.J., Douglas,E., Cunningham,C., Jamieson,F., Stanton,R.J.,
+            Baluchova,K., McSharry,B.P., Tomasec,P., Emery,V.C., Percivalle,E.,
+            Sarasini,A., Gerna,G., Wilkinson,G.W. and Davison,A.J.
+  TITLE     Sequential mutations associated with adaptation of human
+            cytomegalovirus to growth in cell culture
+  JOURNAL   J. Gen. Virol. 91 (PT 6), 1535-1546 (2010)
+   PUBMED   20479471
+REFERENCE   2  (bases 1 to 235233)
+  AUTHORS   Davison,A.J.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (05-NOV-2009) MRC Virology Unit, Church Street, Glasgow
+            G11 5JR, UK
+COMMENT     The original gene nomenclature has been retained. Genes presumably
+            inherited from the common ancestor of alpha-, beta- and
+            gammaherpesviruses (core genes), from the common ancestor of beta-
+            and gammaherpesviruses (betagamma genes), or from the common
+            ancestor of betaherpesviruses (beta genes) are indicated. A
+            standard protein nomenclature has been applied so that orthologs
+            have the same name in all herpesviruses.
+FEATURES             Location/Qualifiers
+     source          1..660
+                     /organism="Human herpesvirus 5"
+                     /mol_type="genomic DNA"
+                     /strain="VR1814"
+                     /isolation_source="cervical secretions of a pregnant woman
+                     with a primary HCMV infection"
+                     /host="Homo sapiens"
+                     /db_xref="taxon:10359"
+                     /country="Italy"
+                     /collection_date="1996"
+                     /note="unpassaged strain in the original clinical sample;
+                     acronym: HCMV; acronym: HHV-5"
+     gene	     5..>660
+     		     /gene="fake gene"
+                     /note="not real"
+ORIGIN      
+        1 ccattccggg ccgcgtgctg ggtccccgag gggcgggggg gtgttttttt cgggggggtg
+       61 aaaattggag ttgcgtgtgt ggacggcgaa tagttgcgtg tggtgcggag gacggcgacg
+      121 gcgaataaaa gcgacgtgcg cggcgcacgt cgcaaagaag acgcgtgtct gtgtctgtct
+      181 gattccccgg ggaaaagagg gagttcccag gggacggcag cgcgggtccc tggggacaca
+      241 cgaaaaacaa cggccagaga caagacgcgg aaaagaggaa gtccctaggg gaccgcgagg
+      301 gcaacgacag acgaagtacg gcacaacccg cgtcgaggac acacgcagag gcggtcgccc
+      361 aggggagggg ggggggtcgc ggaccccgtg gcacactgct tccatccagc cgcgcacacc
+      421 gcacccctga cacaccccgc cagcacaccc ccgacacacc cgccacacgc ccgcgacaca
+      481 ccctgacaca cccggcacac gccctgacac acccggcaca cccgacaccc accccacgca
+      541 cgcacccagc cgcgccccag acacaccccg acagccgcca gcccggcaca ccccgaccgc
+      601 cgccagtgcg ggacagggct gagcgacttc ttggcgccgt aagcgcgccg ccgcttctgc
+//

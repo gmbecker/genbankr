@@ -5,7 +5,13 @@
 \alias{accession}
 \alias{accession,GenBankRecord}
 \alias{accession,GenBankRecord-method}
+\alias{definition}
+\alias{definition,GenBankRecord}
+\alias{definition,GenBankRecord-method}
 \alias{gbk-specific-api}
+\alias{locus}
+\alias{locus,GenBankRecord}
+\alias{locus,GenBankRecord-method}
 \alias{sources}
 \alias{sources,GenBankRecord}
 \alias{sources,GenBankRecord-method}
@@ -17,6 +23,14 @@
 accession(x, ...)
 
 \S4method{accession}{GenBankRecord}(x)
+
+definition(x, ...)
+
+\S4method{definition}{GenBankRecord}(x)
+
+locus(x, ...)
+
+\S4method{locus}{GenBankRecord}(x)
 
 vers(x, ...)
 

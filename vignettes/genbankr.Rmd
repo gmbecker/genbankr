@@ -127,6 +127,19 @@ Additionally, we can specify `ret.anno = FALSE` in `parseGenBank`
 parseGenBank("sample.gbk", ret.anno=FALSE)
 ```
 
+# Creating TxDb objects from genbank annotations
+
+`genbankr` provides the `makeTxDbFromGenBank` function, which accepts a 
+`GenBankRecord` or `GBAccession` object and returns a `TxDb` of the
+annotations.
+
+```{r}
+gbr = readGenBank("sample.gbk")
+tx = makeTxDbFromGenBank(gbr)
+tx
+```
+
+
 
 # Details and caveats
 

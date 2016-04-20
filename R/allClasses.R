@@ -1,5 +1,5 @@
 setOldClass("NULL")
-setClassUnion("DNAStringSetOrNULL", c("DNAStringSet", "NULL"))
+setClassUnion("XStringSetOrNULL", c("XStringSet", "NULL"))
 
 ##' @title GenBank data objects
 ##'
@@ -23,7 +23,7 @@ setClass("GenBankRecord", slots = list(genes = "GenomicRanges", cds = "GenomicRa
                                       accession = "character",
                                       version = "character",
                                       source = "ANY",
-                                      sequence = "DNAStringSetOrNULL"
+                                      sequence = "XStringSetOrNULL"
                                       )
          )
 
