@@ -140,3 +140,21 @@ BUGFIXES
 
      o Fix bug where partial was not being passed down correctly when specified
        in readGenBank call.
+
+Changes in version 0.99.7
+-------------------------
+
+MAJOR USER FACING CHANGES
+
+      o gene_id is now taken from locus_tag when present (in any features of a 
+        given type) and gene is now only used as a backup when locus_tag is 
+	absent for all features of that type.
+
+USER VISIBLE CHANGES
+
+     o gene_synonym added to set of attribute that are assumed multi-valued and
+       always returned as a CharacterList column (without a warning).
+
+BUGFIXES
+
+     o Added Michael Lawrence as second author.

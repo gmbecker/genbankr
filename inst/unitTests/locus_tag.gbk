@@ -1,0 +1,62 @@
+LOCUS       CP000438             6537648 bp    DNA     circular BCT 31-JAN-2014
+DEFINITION  Pseudomonas aeruginosa UCBPP-PA14, complete genome.
+ACCESSION   CP000438 AABQ07000000 AABQ07000001 AABQ07000002 AABQ07000003
+            AABQ07000004 AABQ07000005
+VERSION     CP000438.1  GI:115583796
+DBLINK      BioProject: PRJNA386
+            BioSample: SAMN02603591
+KEYWORDS    .
+SOURCE      Pseudomonas aeruginosa UCBPP-PA14
+  ORGANISM  Pseudomonas aeruginosa UCBPP-PA14
+            Bacteria; Proteobacteria; Gammaproteobacteria; Pseudomonadales;
+            Pseudomonadaceae; Pseudomonas.
+REFERENCE   1  (bases 1 to 6537648)
+  AUTHORS   Lee,D.G., Urbach,J.M., Wu,G., Liberati,N.T., Feinbaum,R.L.,
+            Miyata,S., Diggins,L.T., He,J., Saucier,M., Deziel,E., Friedman,L.,
+            Li,L., Grills,G., Montgomery,K., Kucherlapati,R., Rahme,L.G. and
+            Ausubel,F.M.
+  TITLE     Genomic analysis reveals that Pseudomonas aeruginosa virulence is
+            combinatorial
+  JOURNAL   Genome Biol. 7 (10), R90 (2006)
+   PUBMED   17038190
+REFERENCE   2  (bases 1 to 6537648)
+  AUTHORS   Lee,D.G., Urbach,J.M., Wu,G., Liberati,N.T., Feinbaum,R.,
+            Miyata,S., Diggins,L.T., He,J., Saucier,M., Deziel,E., Friedman,L.,
+            Li,L., Grills,G., Montgomery,K., Kucherlapati,R., Rahme,L.G. and
+            Ausubel,F.M.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (18-AUG-2006) Department of Molecular Biology,
+            Massachusetts General Hospital, Richard B. Simches Research Center,
+            185 Cambridge Street, 7th Floor, Boston, MA 02114, USA
+COMMENT     Source DNA and bacteria available from Fred Ausubel at
+            ausubel@molbio.mgh.harvard.edu.
+FEATURES             Location/Qualifiers
+     source          1..3159
+                     /organism="Pseudomonas aeruginosa UCBPP-PA14"
+                     /mol_type="genomic DNA"
+                     /strain="UCBPP-PA14"
+                     /db_xref="taxon:208963"
+     gene            483..2027
+                     /gene="dnaA"
+                     /locus_tag="PA14_00010"
+     CDS             483..2027
+                     /gene="dnaA"
+                     /locus_tag="PA14_00010"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="chromosomal replication initiator protein DnaA"
+                     /protein_id="ABJ14957.1"
+                     /db_xref="GI:115588942"
+     gene            2056..3159
+                     /gene="dnaN"
+                     /locus_tag="PA14_00020"
+     CDS             2056..3159
+                     /gene="dnaN"
+                     /locus_tag="PA14_00020"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="DNA polymerase III, beta chain"
+                     /protein_id="ABJ14958.1"
+                     /db_xref="GI:115588943"
+ORIGIN      
+//

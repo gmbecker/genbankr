@@ -1,8 +1,10 @@
 Package: genbankr
-Version: 0.99.6
+Version: 0.99.7
 Title: Parsing GenBank files into semantically useful objects
 Description: Reads Genbank files.
-Author: Gabriel Becker
+Authors@R: as.person(c(
+	  "Gabriel Becker <becker.gabriel@gene.com> [aut, cre]",
+	  "Michael Lawrence <lawrence.michael@gene.com> [aut]"))
 Copyright: Genentech, Inc.
 Depends:
     methods

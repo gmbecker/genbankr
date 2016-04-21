@@ -71,3 +71,13 @@ test_txdb = function() {
 
 
 }
+
+test_locustagusage = function() {
+    thing = readGenBank(system.file("unitTests/locus_tag.gbk", package="genbankr"))
+    cdss = cds(thing)
+    txs = transcripts(thing)
+    gns = genes(thing)
+    checkTrue(all(grepl("PA14", gns$gene_id)), msg = "checking that locus_tag is used as gene_id when present on genes GRanges")
+    checkTrue(all(cdss$gene_id %in% gns$gene_id), msg = "checking that cds GRanges gets the right gene_id when locus_tag is available")
+    checkTrue(all(txs$gene_id %in% gns$gene_id), msg = "checking that transcripts GRanges gets the right gene_id when locus_tag is available")
+}

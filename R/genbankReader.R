@@ -503,7 +503,7 @@ parseGenBank = function(file, text = readLines(file),  partial = NA,
 ## also collapses multiple db_xref notes into single CharacterList column and
 ## creates an AAStringSet for the translation field
 
-multivalfields = c("db_xref", "EC_number")
+multivalfields = c("db_xref", "EC_number", "gene_synonym")
 
 fill_stack_df = function(dflist, cols, fill.logical = TRUE, sqinfo = NULL) {
     if(length(dflist) == 0)
@@ -598,18 +598,28 @@ fill_stack_df = function(dflist, cols, fill.logical = TRUE, sqinfo = NULL) {
     grstk
 }
 
+.getGeneIdVec = function(ranges) {
+
+    if(!is.null(ranges$locus_tag))
+        ranges$locus_tag
+    else if(!is.null(ranges$gene)) {
+        message("CDS annotations do not have 'locus_tag' label, using 'gene' as gene_id")
+        ranges$gene
+    } else
+        NULL
+}
 
 
 match_cds_genes = function(cds, genes) {
 
     ## XXX do we want "equal" here or within?
     hits = findOverlaps(cds, genes, type = "equal")
-    cds$gene = NA_character_
-    cds$gene[queryHits(hits)] = genes$gene
-    if(anyNA(cds$gene)) {
+    cds$gene_id= NA_character_
+    cds$gene_id[queryHits(hits)] = genes$gene_id
+    if(anyNA(cds$gene_id)) {
         warning("unable to determine gene for some CDS annotations.",
-                " Ignoring these ", sum(is.na(cds$gene)), " segments")
-        cds = cds[!is.na(cds$gene)]
+                " Ignoring these ", sum(is.na(cds$gene_id)), " segments")
+        cds = cds[!is.na(cds$gene_id)]
     }
     cds
 }
@@ -623,14 +633,21 @@ make_cdsgr = function(rawcdss, gns, sqinfo) {
     ## out of tapply
 
     havegenelabs = FALSE
-    if(is.null(rawcdss$gene) && !is.null(rawcdss$locus_tag)) {
-        message("CDS annotations do not have 'gene' label, using 'locus_tag'")
-        rawcdss$gene = rawcdss$locus_tag
-    }
-    if(!is.null(rawcdss$gene) && !anyNA(rawcdss$gene)) {
+    
+#    if(is.null(rawcdss$gene) && !is.null(rawcdss$locus_tag)) {
+    ## if(is.null(rawcdss$locus_tag) && !is.null(rawcdss$gene)) {
+    ##     message("CDS annotations do not have 'locus_tag' label, using 'gene' as gene_id")
+    ##     rawcdss$gene_id = rawcdss$gene
+    ## } else if(!is.null(rawcdss$locus_tag)) {
+    ##     rawcdss$gene_id = rawcdss$locustag
+    ## } 
+
+    rawcdss$gene_id = .getGeneIdVec(rawcdss)
+        
+    if(!is.null(rawcdss$gene_id) && !anyNA(rawcdss$gene_id)) {
    
-        o = order(order(rawcdss$gene))
-        var = "gene"
+        o = order(order(rawcdss$gene_id))
+        var = "gene_id"
     } else {
         message("genes not available for all CDS ranges, using internal grouping ids")
         var = "temp_grouping_id"
@@ -645,8 +662,6 @@ make_cdsgr = function(rawcdss, gns, sqinfo) {
     cdss$transcript_id = newid
     ## cdsslst = GRangesList(cdssraw)
     ## cdss = unlist(cdsslst)
-    cdss$gene_id = cdss$gene
-    cdss$gene = NULL
     cdss$temp_grouping_id = NULL
     cdss
 }
@@ -666,8 +681,7 @@ make_txgr = function(rawtxs, exons, sqinfo) {
         })
         txslst = GRangesList(txsraw)
         txs = unlist(txslst, use.names=FALSE)
-        txs$gene_id = txs$gene
-        txs$gene = NULL
+        txs$gene_id = .getGeneIdVec(txs)
         txs$temp_grouping_id=NULL
     }  else if (length(exons) == 0L) {
         txs = GRanges(seqinfo=sqinfo)
@@ -730,7 +744,7 @@ make_exongr = function(rawex, cdss, sqinfo) {
     exns = fill_stack_df(rawex, sqinfo = sqinfo)
     if(is.null(exns)) {
 
-            message("No exons read from genbank file. Assuming sections of CDS are full exons")
+        message("No exons read from genbank file. Assuming sections of CDS are full exons")
         if(length(cdss) > 0) {
             exns = cdss
             exns$type = "exon"
@@ -766,20 +780,13 @@ make_exongr = function(rawex, cdss, sqinfo) {
 
 make_genegr = function(x, sqinfo) {
     res = fill_stack_df(x, sqinfo = sqinfo)
-    res$temp_grouping_id = NULL
+
     if(is.null(res))
         res = GRanges(seqinfo = sqinfo)
-    else if(is.null(res$gene)) {
-        message("Gene annotations do not have 'gene' label, looking for 'locus_tag' ... ",
-                appendLF=FALSE)
-        if(!is.null(res$locus_tag)) {
-            message("found.")
-            res$gene = res$locus_tag
-        } else {
-            message("not found.")
-            stop("Unable to determine gene 'names' for gene annotations. Looked for 'gene' and 'locus_tag'")
-        }
-    }
+    else
+        res$gene_id = .getGeneIdVec(res)
+    
+    res$temp_grouping_id = NULL
     res
 }
 
@@ -907,6 +914,7 @@ cheap_unsafe_data.frame = function(..., lst = list(...)) {
     attr(lst, "row.names") = .set_row_names(length(lst[[1]]))
     lst
 }
+
 
  ## microbenchmark(data.frame(x,y),
  ##                as.data.frame(list(x=x, y=y)),
