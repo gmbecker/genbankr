@@ -1,5 +1,5 @@
 Package: genbankr
-Version: 0.99.7
+Version: 0.99.8
 Title: Parsing GenBank files into semantically useful objects
 Description: Reads Genbank files.
 Authors@R: as.person(c(

@@ -503,7 +503,7 @@ parseGenBank = function(file, text = readLines(file),  partial = NA,
 ## also collapses multiple db_xref notes into single CharacterList column and
 ## creates an AAStringSet for the translation field
 
-multivalfields = c("db_xref", "EC_number", "gene_synonym")
+multivalfields = c("db_xref", "EC_number", "gene_synonym", "old_locus_tag")
 
 fill_stack_df = function(dflist, cols, fill.logical = TRUE, sqinfo = NULL) {
     if(length(dflist) == 0)
