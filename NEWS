@@ -1,99 +1,50 @@
-Changes in version 0.0.6
-------------------------
+Changes in version 0.99.8
+-------------------------
 
-USER VISIBLE CHANGES
+USER FACING CHANGES
 
-     o Genbank files which do not contain origin sequence are now supported. 
-       Variation features in such files are ignored with a warning
-
-Changes in version 0.0.7
-------------------------
-
-USER VISIBLE CHANGES
-
-     o When "gene" label is missing in gene and CDS annotations (happens in 
-       plasmid files), locus_tag is used as the gene identifier for both.
+      o use of genbankr and genbankr version are now listed in TxDb objects 
+        created via makeTxDbFromGenBank.
 
 BUGFIXES
 
-     o Fix error when a subset of CDS annotations do not have translation 
-       information.
+      o NEWS file entries are now in most-recent-first order.
 
+Changes in version 0.99.7
+-------------------------
 
-Changes in version 0.0.8
-------------------------
+MAJOR USER FACING CHANGES
 
-USER VISIBLE CHANGES
-
-     o When gene label is NA in (any) CDS annotations, temporary grouping 
-       variable is used to inferm "transcripts"
-
-     o non-valued attributes (e.g. "/pseudo") are now imported as logical 
-       columns, with presence corresponding to TRUE and absence corresponding to
-       FALSE
-
-BUGFIXES 
-
-     o non-valued attributes are no longer appended to the value of the previous
-       attribute.
-
-Changes in version 0.1.0
-------------------------
+      o gene_id is now taken from locus_tag when present (in any features of a 
+        given type) and gene is now only used as a backup when locus_tag is 
+	absent for all features of that type.
 
 USER VISIBLE CHANGES
 
-     o Text argument now supports character vector of length 1 with embedded 
-       newlines in addition to character vectors of length N without.
+     o gene_synonym added to set of attribute that are assumed multi-valued and
+       always returned as a CharacterList column (without a warning).
 
-     o Added GBAccession class and constructor
+BUGFIXES
 
-     o If a GBAccession is passed to readGenBank's first argument (file), the 
-       GenBank formatted content will be retrieved from NCBI using rentrez (if 
-       available)
+     o Added Michael Lawrence as second author.
 
-     o rentrez added to Suggests
 
-     o added seqinfo capture and support for GenBankAnnot, GenBankFull, and 
-       underlying G/VRanges
-
-     o Added support for parsing more than one GenBank file/content block at 
-       once, e.g. when a GBAccession vector of length > 1 is passed to 
-       readGenBank.
-
-BUGFIXES 
-
-     o Seqnames are no longer appended with ":1" when only one source
-       (/chromosome/plasmid/etc) is present in the file.
-
-     o Ensure correct (matching) transcript ids are manufactured when both mRNA
-       and CDS features are annotated in the file. Ensure generated transcript 
-       ids include gene identity when known.
-
-Changes in version 0.99.2
+Changes in version 0.99.6
 -------------------------
 
 USER VISIBLE CHANGES
 
-     o Version number jump as part of Bioconductor submission process
+     o Added support for creating of TxDb objects from GenBankRecord objects
 
-     o Added runnable examples to (most) help files
-
-     o Hook existing unit tests into Bioconductor testing harness
-     
-     o Add fastpass to extract sequence, in the form of seq.only argument to 
-       parseGenBank, and getSeq methods for GBAccession and GenBankFile classes
+     o Added support for genpept files to readGenBank and parseGenBank
 
 BUGFIXES
 
-     o Fix some accessor methods for GenBankFull which didn't call annotations()
-       to grab GenBankAnnot object before accessing slots.
+     o Fix bug where partial was not being passed down correctly when specified
+       in readGenBank call.
 
-Changes in version 0.99.4
--------------------------
 
-BUGFIXES
 
-     o Fix small documentation bugs to squash check warnings
 
 Changes in version 0.99.5
 -------------------------
@@ -127,34 +78,110 @@ BUGFIXES
      o Fix bug when *all* variation features in a file lack /replace (for
        VRanges alt is a mandatory field).
 
-Changes in version 0.99.6
+
+Changes in version 0.99.4
+-------------------------
+
+BUGFIXES
+
+     o Fix small documentation bugs to squash check warnings
+
+
+Changes in version 0.99.2
 -------------------------
 
 USER VISIBLE CHANGES
 
-     o Added support for creating of TxDb objects from GenBankRecord objects
+     o Version number jump as part of Bioconductor submission process
 
-     o Added support for genpept files to readGenBank and parseGenBank
+     o Added runnable examples to (most) help files
+
+     o Hook existing unit tests into Bioconductor testing harness
+     
+     o Add fastpass to extract sequence, in the form of seq.only argument to 
+       parseGenBank, and getSeq methods for GBAccession and GenBankFile classes
 
 BUGFIXES
 
-     o Fix bug where partial was not being passed down correctly when specified
-       in readGenBank call.
+     o Fix some accessor methods for GenBankFull which didn't call annotations()
+       to grab GenBankAnnot object before accessing slots.
 
-Changes in version 0.99.7
--------------------------
 
-MAJOR USER FACING CHANGES
-
-      o gene_id is now taken from locus_tag when present (in any features of a 
-        given type) and gene is now only used as a backup when locus_tag is 
-	absent for all features of that type.
+Changes in version 0.1.0
+------------------------
 
 USER VISIBLE CHANGES
 
-     o gene_synonym added to set of attribute that are assumed multi-valued and
-       always returned as a CharacterList column (without a warning).
+     o Text argument now supports character vector of length 1 with embedded 
+       newlines in addition to character vectors of length N without.
+
+     o Added GBAccession class and constructor
+
+     o If a GBAccession is passed to readGenBank's first argument (file), the 
+       GenBank formatted content will be retrieved from NCBI using rentrez (if 
+       available)
+
+     o rentrez added to Suggests
+
+     o added seqinfo capture and support for GenBankAnnot, GenBankFull, and 
+       underlying G/VRanges
+
+     o Added support for parsing more than one GenBank file/content block at 
+       once, e.g. when a GBAccession vector of length > 1 is passed to 
+       readGenBank.
+
+BUGFIXES 
+
+     o Seqnames are no longer appended with ":1" when only one source
+       (/chromosome/plasmid/etc) is present in the file.
+
+     o Ensure correct (matching) transcript ids are manufactured when both mRNA
+       and CDS features are annotated in the file. Ensure generated transcript 
+       ids include gene identity when known.
+
+
+Changes in version 0.0.8
+------------------------
+
+USER VISIBLE CHANGES
+
+     o When gene label is NA in (any) CDS annotations, temporary grouping 
+       variable is used to inferm "transcripts"
+
+     o non-valued attributes (e.g. "/pseudo") are now imported as logical 
+       columns, with presence corresponding to TRUE and absence corresponding to
+       FALSE
+
+BUGFIXES 
+
+     o non-valued attributes are no longer appended to the value of the previous
+       attribute.
+
+
+Changes in version 0.0.7
+------------------------
+
+USER VISIBLE CHANGES
+
+     o When "gene" label is missing in gene and CDS annotations (happens in 
+       plasmid files), locus_tag is used as the gene identifier for both.
 
 BUGFIXES
 
-     o Added Michael Lawrence as second author.
+     o Fix error when a subset of CDS annotations do not have translation 
+       information.
+
+
+Changes in version 0.0.6
+------------------------
+
+USER VISIBLE CHANGES
+
+     o Genbank files which do not contain origin sequence are now supported. 
+       Variation features in such files are ignored with a warning
+
+
+
+
+
+

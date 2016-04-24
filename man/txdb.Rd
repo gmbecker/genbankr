@@ -26,4 +26,8 @@ A TxDb object
 \description{
 Create a TxDb object from a GenBankRecord.
 }
+\examples{
+thing = readGenBank(system.file("unitTests/compjoin.gbk", package="genbankr"))
+tx = makeTxDbFromGenBank(thing)
+}
 
