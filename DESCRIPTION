@@ -1,5 +1,5 @@
 Package: genbankr
-Version: 0.99.8
+Version: 0.99.9
 Title: Parsing GenBank files into semantically useful objects
 Description: Reads Genbank files.
 Authors@R: as.person(c(
@@ -17,7 +17,8 @@ Imports:
     VariantAnnotation,
     rtracklayer,
     S4Vectors,
-    GenomeInfoDb
+    GenomeInfoDb,
+    Biobase
 Suggests:
     RUnit,
     rentrez,
