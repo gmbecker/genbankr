@@ -11,6 +11,7 @@ test_Vars = function() {
     gba = genbankr::make_gbrecord(raw)
     vr = gba@variations
     checkEquals(length(vr), 4L, "Variation test didn't result in 4 variants")
+    checkTrue(is(getSeq(gba), "DNAStringSet") && !isCircular(gba), "readGenBank did not handle detecting sequence type and circularity from the LOCUS correctly")
 }
 
 test_JoinCompl = function() {

@@ -387,7 +387,7 @@ fastwriteread = function(txtline) {
 
 ##LOCUS       ABD64816                1353 aa            linear   INV 12-MAR-2006
 .seqTypeFromLocus = function(locus) {
-    gsub("^[[:space:]]*LOCUS[[:space:]]+[[:alnum:]]+[[:space:]]+[[:digit:]]+[[:space:]]+([^[:space:]]+).*",
+    gsub("^[[:space:]]*LOCUS[[:space:]]+[^[:space:]]+[[:space:]]+[[:digit:]]+[[:space:]]+([^[:space:]]+).*",
          "\\1",
          locus)
 }
@@ -471,7 +471,6 @@ parseGenBank = function(file, text = readLines(file),  partial = NA,
     ##DNAString to DNAStringSet
     origin = resthang$ORIGIN 
     if(ret.seq && length(origin) > 0) {
-        
         typs = sapply(resthang$FEATURES, function(x) x$type[1])
         srcs = fill_stack_df(resthang$FEATURES[typs == "source"])
         ## dss = DNAStringSet(lapply(GRanges(ranges(srcs), function(x) origin[x])))
