@@ -1,3 +1,12 @@
+Changes in version 1.1.3
+------------------------
+
+BUGFIXES
+
+      o Fix bug in .seqTypeFromLOCUS when accession has non-alphanumeric characters (will
+      	be backported to version 1.0.3.
+
+
 Changes in version 0.99.9
 -------------------------
 
@@ -179,9 +188,3 @@ USER VISIBLE CHANGES
 
      o Genbank files which do not contain origin sequence are now supported. 
        Variation features in such files are ignored with a warning
-
-
-
-
-
-
