@@ -204,12 +204,11 @@ strip_outer_operator = function(str, op = "complement") {
     sstr = substr(str, 1, 1)
     if(sstr == "j") ##join
         str = strip_outer_operator(str, "join")
-    else if(sstr == "o") ## order (grepl("^order", str))
+    else if(sstr == "o") ## order 
         str = strip_outer_operator(str, "order")
     spl = strsplit(str, ",", fixed=TRUE)[[1]]
     grs = lapply(spl, make_feat_gr, chr = chr, ats = ats,
                  partial = partial, strand = strand)
-    ##    do.call(rbind.data.frame, grs)
     .simple_rbind_dataframe(grs)
 }
 
@@ -222,8 +221,6 @@ make_feat_gr = function(str, chr, ats, partial = NA, strand = NA) {
     } 
     
     
-    ##    if (grepl("(join|order)", str))
-    ##    if(grepl("join", fixed=TRUE, str) | grepl("order", str, fixed=TRUE))
     sbstr = substr(str, 1, 4)
     if(sbstr == "join" || sbstr == "orde")
         return(.do_join_silliness(str = str, chr = chr,
@@ -263,7 +260,6 @@ make_feat_gr = function(str, chr, ats, partial = NA, strand = NA) {
 
 read_feat_attr = function(line) {
     num =  grepl('=[[:digit:]]+(\\.[[:digit:]]+){0,1}$', line)
-    #val = gsub('[[:space:]]*/[^=]+="{0,1}([^"]*)"{0,1}', "\\1", line)
     val = gsub('[[:space:]]*/[^=]+($|="{0,1}([^"]*)"{0,1})', "\\2", line)
     mapply(function(val, num) {
         if(nchar(val)==0)
@@ -318,7 +314,7 @@ readFeatures = function(lines, partial = NA, verbose = FALSE,
         ## consume primary feature line
         lines = lines[-1] 
         if(length(lines)) {
-            attrs = read_feat_attr(lines)#lapply(lines, read_feat_attr)
+            attrs = read_feat_attr(lines)
             
             names(attrs) = gsub("^[[:space:]]*/([^=]+)($|=[^[:space:]].*$)", "\\1", lines)
             if(type == "source") {
@@ -507,60 +503,56 @@ multivalfields = c("db_xref", "EC_number", "gene_synonym", "old_locus_tag")
 fill_stack_df = function(dflist, cols, fill.logical = TRUE, sqinfo = NULL) {
     if(length(dflist) == 0)
         return(NULL)
-   # if(length(dflist) > 1) {
 
-        allcols = unique(unlist(lapply(dflist, function(x) names(x))))
-        basenms = gsub("(.*)(\\.[[:digit:]]+)$", "\\1", allcols)
-        nmtab = table(basenms)
-        dupnms = names(nmtab[nmtab>1])
-        if(any(!dupnms %in% multivalfields))
-            warning("Got unexpected multi-value field(s) [ ",
-                    paste(setdiff(dupnms, multivalfields), collapse = ", "),
-                    " ]. The resulting column(s) will be of class CharacterList, rather than vector(s). Please contact the maintainer if multi-valuedness is expected/meaningful for the listed field(s).")
-        allcols = unique(basenms)
-        
-        logcols = unique(unlist(lapply(dflist, function(x) names(x)[sapply(x, is.logical)])))
-        charcols = setdiff(allcols, logcols)
-        
-        if(missing(cols))
-            cols = allcols
-        
-        filled = mapply(
-            function(x, i) {
-            ## have to deal with arbitrary multiple columns
-            ## transform them into list columns
-            for(nm in dupnms) {
-                locs = grep(nm, names(x))
-                if(length(locs)) {
-                    rows = lapply(seq(along = rownames(x)),
-                                         function(y) unlist(x[y,locs]))
-                           
-                    x = x[,-locs]
-                } else {
-                    rows = list(character())
-                }
 
-                x[[nm]] = rows
+    allcols = unique(unlist(lapply(dflist, function(x) names(x))))
+    basenms = gsub("(.*)(\\.[[:digit:]]+)$", "\\1", allcols)
+    nmtab = table(basenms)
+    dupnms = names(nmtab[nmtab>1])
+    if(any(!dupnms %in% multivalfields))
+        warning("Got unexpected multi-value field(s) [ ",
+                paste(setdiff(dupnms, multivalfields), collapse = ", "),
+                " ]. The resulting column(s) will be of class CharacterList, rather than vector(s). Please contact the maintainer if multi-valuedness is expected/meaningful for the listed field(s).")
+    allcols = unique(basenms)
+    
+    logcols = unique(unlist(lapply(dflist, function(x) names(x)[sapply(x, is.logical)])))
+    charcols = setdiff(allcols, logcols)
+    
+    if(missing(cols))
+        cols = allcols
+    
+    filled = mapply(
+        function(x, i) {
+        ## have to deal with arbitrary multiple columns
+        ## transform them into list columns
+        for(nm in dupnms) {
+            locs = grep(nm, names(x))
+            if(length(locs)) {
+                rows = lapply(seq(along = rownames(x)),
+                              function(y) unlist(x[y,locs]))
+                
+                x = x[,-locs]
+            } else {
+                rows = list(character())
             }
+            
+            x[[nm]] = rows
+        }
         
         
-
+        
         ## setdiff is not symmetric
-            missnm = setdiff(charcols, names(x))
-            x[,missnm] = NA_character_
-            falsenm = setdiff(logcols, names(x))
-            x[,falsenm] = FALSE
-            x = x[,cols]
-            x$temp_grouping_id = i
-            x
-        }, x = dflist, i = seq(along = dflist), SIMPLIFY=FALSE)
- #   stk = do.call(rbind, c(filled, deparse.level=0, make.row.names=FALSE))
-        stk = .simple_rbind_dataframe(filled, "temp")
-    ## } else {
-    ##     stk = dflist[[1]]
-    ## }
+        missnm = setdiff(charcols, names(x))
+        x[,missnm] = NA_character_
+        falsenm = setdiff(logcols, names(x))
+        x[,falsenm] = FALSE
+        x = x[,cols]
+        x$temp_grouping_id = i
+        x
+    }, x = dflist, i = seq(along = dflist), SIMPLIFY=FALSE)
+    stk = .simple_rbind_dataframe(filled, "temp")
     stk[["temp"]] = NULL
-
+    
     listcols = which(sapply(names(stk),
                             function(x) is(stk[[x]], "list") ||
                                         x %in% multivalfields))
@@ -633,14 +625,6 @@ make_cdsgr = function(rawcdss, gns, sqinfo) {
 
     havegenelabs = FALSE
     
-#    if(is.null(rawcdss$gene) && !is.null(rawcdss$locus_tag)) {
-    ## if(is.null(rawcdss$locus_tag) && !is.null(rawcdss$gene)) {
-    ##     message("CDS annotations do not have 'locus_tag' label, using 'gene' as gene_id")
-    ##     rawcdss$gene_id = rawcdss$gene
-    ## } else if(!is.null(rawcdss$locus_tag)) {
-    ##     rawcdss$gene_id = rawcdss$locustag
-    ## } 
-
     rawcdss$gene_id = .getGeneIdVec(rawcdss)
         
     if(!is.null(rawcdss$gene_id) && !anyNA(rawcdss$gene_id)) {
@@ -659,15 +643,12 @@ make_cdsgr = function(rawcdss, gns, sqinfo) {
 
     cdss = rawcdss
     cdss$transcript_id = newid
-    ## cdsslst = GRangesList(cdssraw)
-    ## cdss = unlist(cdsslst)
     cdss$temp_grouping_id = NULL
     cdss
 }
 
 
 make_txgr = function(rawtxs, exons, sqinfo) {
-    ##    rawtxs = sanitize_feats(rawtxs, tx_cols)
     if(length(rawtxs) > 0) {
         rawtxs = fill_stack_df(rawtxs, sqinfo = sqinfo)
         rawtxs$tx_id_base = ifelse(is.na(rawtxs$gene), paste("unknown_gene", cumsum(is.na(rawtxs$gene)), sep="_"), rawtxs$gene)
@@ -714,10 +695,6 @@ make_varvr = function(rawvars, sq, sqinfo) {
     ## if none of them do, the column won't exist at all
     if(is.null(vrs$replace))
         vrs$replace = NA_character_
-    ## if(any(is.na(vrs$replace))) {
-    ##     warning("Removing seemingly unspecified variation features (no /replace)")
-    ##     vrs = vrs[!is.na(vrs$replace)]
-    ## }
 
     ## makeVRangesFromGRanges seems to have a bug(?) that requires the
     ## columns used dfor the VRanges core info to be the first 6 in the
