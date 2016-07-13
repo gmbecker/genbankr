@@ -1,3 +1,15 @@
+Changes in version 1.1.5
+------------------------
+
+MINOR CHANGES
+
+      o Change vignette to use system file to retrieve sample file
+      	in response to ROpenSci reviewer comment.
+
+      o Change vignette builder from knitr to rmarkdown in response
+      	to ROpenSci reviewer comment.
+	
+
 Changes in version 1.1.4
 ------------------------
 

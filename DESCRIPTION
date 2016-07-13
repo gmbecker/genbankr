@@ -1,5 +1,5 @@
 Package: genbankr
-Version: 1.1.4
+Version: 1.1.5
 Title: Parsing GenBank files into semantically useful objects
 Description: Reads Genbank files.
 Authors@R: as.person(c(
@@ -22,9 +22,9 @@ Imports:
 Suggests:
     RUnit,
     rentrez,
-    knitr
+    rmarkdown
 Maintainer: Gabriel Becker <becker.gabriel@gene.com>
-VignetteBuilder: knitr
+VignetteBuilder: rmarkdown
 License: Artistic-2.0
 RoxygenNote: 5.0.1.9000
 biocViews: Infrastructure, DataImport
