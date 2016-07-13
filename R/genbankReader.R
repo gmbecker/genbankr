@@ -201,6 +201,22 @@ strip_outer_operator = function(str, op = "complement") {
 .do_join_silliness = function(str, chr, ats, partial = NA, strand = NA) {
     
                                         #    if(grepl("^join", str))
+    if(is.na(partial) || !partial) {
+        part = grepl("[<>]", str)
+        if(part) {
+            if(is.na(partial))
+                message("Partial range detected in a compound range (join or order) feature. Excluding entire annotation")
+            return(
+                data.frame(seqnames = character(),
+                           start = numeric(),
+                           end = numeric(),
+                           strand = character(),
+                           type = character(),
+                           stringsAsFactors=FALSE)
+            )
+        }
+    }
+        
     sstr = substr(str, 1, 1)
     if(sstr == "j") ##join
         str = strip_outer_operator(str, "join")
@@ -210,6 +226,7 @@ strip_outer_operator = function(str, op = "complement") {
     grs = lapply(spl, make_feat_gr, chr = chr, ats = ats,
                  partial = partial, strand = strand)
     .simple_rbind_dataframe(grs)
+
 }
 
 
@@ -501,8 +518,10 @@ parseGenBank = function(file, text = readLines(file),  partial = NA,
 multivalfields = c("db_xref", "EC_number", "gene_synonym", "old_locus_tag")
 
 fill_stack_df = function(dflist, cols, fill.logical = TRUE, sqinfo = NULL) {
-    if(length(dflist) == 0)
+    if(length(dflist) == 0 )
         return(NULL)
+
+    dflist = dflist[sapply(dflist, function(x) !is.null(x) && nrow(x) > 0)]
 
 
     allcols = unique(unlist(lapply(dflist, function(x) names(x))))
@@ -589,15 +608,30 @@ fill_stack_df = function(dflist, cols, fill.logical = TRUE, sqinfo = NULL) {
     grstk
 }
 
-.getGeneIdVec = function(ranges) {
 
-    if(!is.null(ranges$locus_tag))
-        ranges$locus_tag
-    else if(!is.null(ranges$gene)) {
-        message("CDS annotations do not have 'locus_tag' label, using 'gene' as gene_id")
-        ranges$gene
-    } else
+allna = function(vec) all(is.na(vec))
+
+.getGeneIdLab = function(ranges, verbose, stoponfail = FALSE) {
+    cols = names(mcols(ranges))
+    if("gene_id" %in% cols && !allna(ranges$gene_id))
+        "gene_id"
+    else if("locus_tag" %in% cols)
+        "locus_tag"
+    else if ("gene" %in% cols) {
+        if(verbose)
+            message("Annotations don't have 'locus_tag' label, using 'gene' as gene_id column")
+        "gene"
+    } else if (stoponfail)
+        stop("Unable to determine gene id column on feature GRanges object")
+    else
         NULL
+}
+
+.getGeneIdVec = function(ranges) {
+    res = .getGeneIdLab(ranges, verbose = TRUE)
+    if(!is.null(res))
+        res = mcols(ranges)[[res]]
+    res
 }
 
 
@@ -648,13 +682,92 @@ make_cdsgr = function(rawcdss, gns, sqinfo) {
 }
 
 
-make_txgr = function(rawtxs, exons, sqinfo) {
+.gnMappingHlpr = function(gnfeat, txfeatlst, knownlabs,
+                          splcol = .getGeneIdLab(gnfeat, stoponfail=TRUE,
+                                                 verbose=FALSE),
+                          olaptype = "within", stopondup = TRUE) {
+    unknown = which(is.na(knownlabs))
+    ## is it already split?
+    if(!is(gnfeat, "GRangesList"))
+        gnfeat = split(gnfeat, mcols(gnfeat)[[splcol]])
+    hts = findOverlaps(gnfeat, txfeatlst, type=olaptype, select="all")
+    ## duplicated queryHits is ok b/c gene can have more than one tx, right?
+    subhits = subjectHits(hts)
+    if(anyDuplicated(subhits)) {
+        duphits = which(duplicated(subhits))
+        dupstart = start(phead(txfeatlst[duphits], 1))
+        
+        if(stopondup)
+            stop("mRNA feature(s) starting at [",
+                 paste(as.vector(dupstart), collapse=", "),
+                 "] appear to match more than one gene. If you feel the file is",
+                 " correct please contact the maintainer.")
+        else { # throw away dup hits so they stay NA
+            hts = hts[subhits %in% subhits[duphits],]
+            subhits = subjectHits(hts)
+        }
+    }
+    ## don't override information that we already know.
+    ## if efficiency of this routine ever becomes an issue
+    ## this subsetting should be pushed up before the overlap
+    ## calcs, but the indexing is simpler here and I don't
+    ## think it will be too slow. We'll see ....
+
+    keep = subhits %in% unknown
+    
+    knownlabs[ subhits[ keep ] ] = names(gnfeat)[ queryHits(hts)[ keep ] ]
+    knownlabs
+}
+
+
+##' @param rawtx GRanges. Raw transcript (mRNA) feature GRanges
+##' @param exons GRanges. Exon feature GRanges
+##' @param genes GRanges. genes 
+assignTxsToGenes = function(rawtx, exons, genes) {
+
+    txspl = split(rawtx, rawtx$temp_grouping_id)
+
+    gnlabs = rep(NA_character_, times = length(txspl))
+    
+    ## exon mapping is more precise, try that first.    
+    ## exons should fall strictly within transcript sections
+    ## not identical b/c of padding at ends. AFAIK should
+    ## be identical for internal exons, but we aren't
+    ## specifically checking for that here.
+
+    gnlabs = .gnMappingHlpr(exons, txspl, gnlabs)
+    if(anyNA(gnlabs)) {
+        
+        ## damn, now we have to try with genes
+        gnlabs = .gnMappingHlpr(genes, txspl, gnlabs,
+                            olaptype = "any",
+                            stopondup=FALSE)
+
+    }
+    
+    rawtx$gene_id= rep(gnlabs, times = lengths(txspl))
+    rawtx
+
+}
+
+
+
+
+make_txgr = function(rawtxs, exons, sqinfo, genes) {
     if(length(rawtxs) > 0) {
         rawtxs = fill_stack_df(rawtxs, sqinfo = sqinfo)
-        rawtxs$tx_id_base = ifelse(is.na(rawtxs$gene), paste("unknown_gene", cumsum(is.na(rawtxs$gene)), sep="_"), rawtxs$gene)
+        gvec = .getGeneIdVec(rawtxs)
+        if(is.null(gvec)) {
+            rawtxs = assignTxsToGenes(rawtxs, exons, genes)
+            gvec = .getGeneIdVec(rawtxs)
+        }
+            
+        rawtxs$tx_id_base = ifelse(is.na(gvec), paste("unknown_gene", cumsum(is.na(gvec)), sep="_"), gvec)
         spltxs = split(rawtxs, rawtxs$tx_id_base)
         txsraw = lapply(spltxs, function(grl) {
-            grl$transcript_id = paste(grl$tx_id_base, 1:length(grl), 
+            grl$transcript_id = paste(grl$tx_id_base, (grl$temp_grouping_id -
+                                                       min(grl$temp_grouping_id) +
+                                                       1),
                                       sep=".")
             grl$tx_id_base = NULL
             grl
@@ -819,7 +932,7 @@ make_gbrecord = function(rawgbk, verbose = FALSE) {
     if(verbose)
         message(Sys.time(), " Starting creation of transcript GRanges")
 
-    txs = make_txgr(featspl$mRNA, exons = exns, sqinfo)
+    txs = make_txgr(featspl$mRNA, exons = exns, sqinfo, genes = gns)
     
     if(verbose)
         message(Sys.time(), " Starting creation of misc feature GRanges")

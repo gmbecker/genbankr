@@ -1,3 +1,16 @@
+Changes in version 1.1.4
+------------------------
+
+BUGFIXES
+
+      o Fix bug when mRNA features are present and not annototated with gene.
+      	Addresses half of https://github.com/gmbecker/genbankr/issues/1 Will be
+	backported to 1.0.4
+
+      o Fix bug when joins include incomplete range (< or >).
+      	Addresses second half of https://github.com/gmbecker/genbankr/issues/1
+	Will be backported to 1.0.4
+
 Changes in version 1.1.3
 ------------------------
 
