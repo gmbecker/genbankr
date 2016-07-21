@@ -5,7 +5,7 @@ output:
   BiocStyle::html_document
 vignette: >
   %\VignetteIndexEntry{genbankr}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{rmarkdown::rmarkdown}
   %\VignetteEncoding{UTF-8}  
 ---
 
@@ -22,7 +22,8 @@ format (via the `text` argument).
 
 ```{r}
 suppressPackageStartupMessages(library(genbankr))
-gb = readGenBank("sample.gbk")
+smpfile = system.file("sample.gbk", package="genbankr")
+gb = readGenBank(smpfile)
 gb
 ```
 
@@ -73,7 +74,7 @@ getSeq(gb)
 While use and integration of the Bioconductor machinery is recommended, we also provide low-level parsing capabilities via the workhorse `parseGenBank` function. This function returns a list structure roughly corresponding to the top-level headings within the  genbank format itself:
 
 ```{r}
-pg = parseGenBank("sample.gbk")
+pg = parseGenBank(smpfile)
 str(pg, max.level = 1)
 ```
 
@@ -82,7 +83,7 @@ str(pg, max.level = 1)
 If desired, `readGenBank` and `parseGenBank` can omit full sequence of the organism by specifying `ret.seq=FALSE`. In this case, `readGenBank` returns a `GenBankAnnot` object, rather than a `GenBankFull`
 
 ```{r}
-gbf = readGenBank("sample.gbk", ret.seq = FALSE)
+gbf = readGenBank(smpfile, ret.seq = FALSE)
 gbf
 ```
 
@@ -93,7 +94,7 @@ All of the accessor methods discussed above work for `GenBankFull` objects as th
 We also provide a convenience method for using *rtracklayer* `import` style mechanics for reading GenBank files:
 
 ```{r}
-gbkfile = GenBankFile("sample.gbk")
+gbkfile = GenBankFile(smpfile)
 gb2 = import(gbkfile)
 ```
 
@@ -124,7 +125,7 @@ getSeq(gbkfile)
 Additionally, we can specify `ret.anno = FALSE` in `parseGenBank`
 
 ```{r}
-parseGenBank("sample.gbk", ret.anno=FALSE)
+parseGenBank(smpfile, ret.anno=FALSE)
 ```
 
 # Creating TxDb objects from genbank annotations
@@ -134,7 +135,7 @@ parseGenBank("sample.gbk", ret.anno=FALSE)
 annotations.
 
 ```{r}
-gbr = readGenBank("sample.gbk")
+gbr = readGenBank(smpfile)
 tx = makeTxDbFromGenBank(gbr)
 tx
 ```
