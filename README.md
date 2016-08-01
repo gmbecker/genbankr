@@ -61,6 +61,27 @@ The Bioconductor development repository will contain
 the latest development version of genbankr which has passed testing (lagged
 by about a day).
 
+## Basic usage
+
+The primary workhorse function in `genbankr` is `readGenBank()`. To read a genbank
+file, simply call this function on the downloaded file, or on a GBAccession object.
+
+```
+library(genbankr)
+mygbk = readGenbank("gbkfile.gbk")
+```
+
+For a more complete discussion of how to use the `genbankr` package, please see
+the compiled vignette [here](https://bioconductor.org/packages/release/bioc/vignettes/genbankr/inst/doc/genbankr.html)
+
+
+## Help and filing bugs
+
+Please post any usage questions about `genbankr` on the Bioconductor Support Site
+[here](https://support.bioconductor.org/) with the tag genbankr.
+
+Bugs and feature requests can be filed as issues on this Github repository.
+
 ## Code of Conduct
 
 This project operates under the Contributor Covenenant Code of Coduct [see here](./CONDUCT.md)
