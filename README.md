@@ -69,9 +69,4 @@ This project operates under the Contributor Covenenant Code of Coduct [see here]
 
 The `genbankr` package is a part of the Bioconductor and rOpenSci projects.
 
-<table>
-<tr>
-<td width="250">[![bioconductor_footer](http://bioconductor.org/images/logo_bioconductor.gif)](http://bioconductor.org)</td>
-<td width="250">[![ropensci_footer](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)</td>
-</tr>
-</table>
+| [![bioconductor_footer](http://bioconductor.org/images/logo_bioconductor.gif)](http://bioconductor.org) | [![ropensci_footer](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org) |
