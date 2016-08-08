@@ -85,3 +85,9 @@ Bugs and feature requests can be filed as issues on this Github repository.
 ## Code of Conduct
 
 This project operates under the Contributor Covenenant Code of Coduct [see here](./CONDUCT.md)
+
+## Package Affiliations
+
+The `genbankr` package is a part of the Bioconductor and rOpenSci projects.
+
+[![bioconductor_footer](http://bioconductor.org/images/logo_bioconductor.gif)](http://bioconductor.org) [![ropensci_footer](http://ropensci.org/public_images/github_footer.png)](http://ropensci.org)
