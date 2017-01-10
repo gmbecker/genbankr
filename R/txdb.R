@@ -45,9 +45,11 @@ setMethod("makeTxDbFromGenBank", "GenBankRecord",
     cdsgr = cds(gbr)
     ##otherwise the exonrank calc below doesn't come out
     ## in the right order!
-    cdsgr = cdsgr[order(cdsgr$transcript_id)]
+    ##cdsgr = cdsgr[order(cdsgr$transcript_id)]
     cdspl = split(cdsgr, cdsgr$transcript_id)
     grouplens = lengths(cdspl)
+    ##fix order. previous trick stopped working
+    grouplens = grouplens[unique(cdsgr$transcript_id)]
     justfirstspl = phead(cdspl, 1)
     strnd = as.character(strand(unlist(justfirstspl)))
 

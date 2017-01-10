@@ -1,11 +1,14 @@
 Package: genbankr
-Version: 1.3.0
+Version: 1.3.2
 Title: Parsing GenBank files into semantically useful objects
 Description: Reads Genbank files.
-Authors@R: as.person(c(
-	  "Gabriel Becker <becker.gabriel@gene.com> [aut, cre]",
-	  "Michael Lawrence <lawrence.michael@gene.com> [aut]"))
+Authors@R: c(person("Gabriel", "Becker", role = c("aut", "cre"),
+	            email = "becker.gabriel@gene.com"),
+	     person("Michael", "Lawrence", role = "aut",
+	            email = "lawrence.michael@gene.com"))
 Copyright: Genentech, Inc.
+Maintainer: Gabriel Becker <becker.gabriel@gene.com>
+License: Artistic-2.0
 Depends:
     methods
 Imports:
@@ -22,10 +25,10 @@ Imports:
 Suggests:
     RUnit,
     rentrez,
-    rmarkdown
-Maintainer: Gabriel Becker <becker.gabriel@gene.com>
-VignetteBuilder: rmarkdown
-License: Artistic-2.0
+    knitr,
+    rmarkdown,
+    BiocStyle
+VignetteBuilder: knitr
 RoxygenNote: 5.0.1.9000
 biocViews: Infrastructure, DataImport
 NeedsCompilation: no

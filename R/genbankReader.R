@@ -904,7 +904,7 @@ make_gbrecord = function(rawgbk, verbose = FALSE) {
     typs = typs[!empty]
     featspl = split(feats, typs)
     srcs = fill_stack_df(featspl$source)
-    circ = grepl("circular", rawgbk$LOCUS)
+    circ = rep(grepl("circular", rawgbk$LOCUS), times = length(srcs))
     ##grab the versioned accession to use as the "genome" in seqinfo
     genom = strsplit(rawgbk$VERSION, " ")[[1]][1]
     sqinfo = Seqinfo(seqlevels(srcs), width(srcs), circ, genom)
@@ -969,13 +969,13 @@ make_gbrecord = function(rawgbk, verbose = FALSE) {
         list.name.col = factor(rep(names(dflist), numrows), levels=names(dflist))
     }
     dflist = dflist[ numrows > 0 ] # ARGH, if some data.frames have zero rows, factors become integers
-    myunlist = base::unlist
+  #  myunlist = function(x)  base::unlist(x, recursive=FALSE, use.names=FALSE)
     mylapply = base::lapply
     cn = names(dflist[[1]])
     inds = structure(1L:length(cn), names=cn)
     big <- mylapply(inds,
                     function(x) {
-        myunlist(
+        unlist(
                                         # mylapply(dflist, function(y) { y[[x]] }),
             mylapply(dflist, function(y) { .subset2(y, x) }),
             recursive=FALSE, use.names=FALSE)
