@@ -1,3 +1,6 @@
+[![](https://badges.ropensci.org/47_status.svg)](https://github.com/ropensci/onboarding/issues/47)
+
+
 ## Package
 
 The `genbankr` package is part of the Bioconductor ecosystem of R packages. As
