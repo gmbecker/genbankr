@@ -50,7 +50,7 @@ setMethod("makeTxDbFromGenBank", "GenBankRecord",
     grouplens = lengths(cdspl)
     ##fix order. previous trick stopped working
     grouplens = grouplens[unique(cdsgr$transcript_id)]
-    justfirstspl = phead(cdspl, 1)
+    justfirstspl = heads(cdspl, 1)
     strnd = as.character(strand(unlist(justfirstspl)))
 
     ## beware of order here. the split sorts the factors! that's why

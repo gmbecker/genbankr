@@ -695,7 +695,7 @@ make_cdsgr = function(rawcdss, gns, sqinfo) {
     subhits = subjectHits(hts)
     if(anyDuplicated(subhits)) {
         duphits = which(duplicated(subhits))
-        dupstart = start(phead(txfeatlst[duphits], 1))
+        dupstart = start(heads(txfeatlst[duphits], 1))
         
         if(stopondup)
             stop("mRNA feature(s) starting at [",
@@ -782,7 +782,7 @@ make_txgr = function(rawtxs, exons, sqinfo, genes) {
         message("No transcript features (mRNA) found, using spans of CDSs")
         spl = split(exons, exons$transcript_id)
         txslst = range(spl)
-        mcdf = mcols(unlist(phead(spl, 1)))
+        mcdf = mcols(unlist(heads(spl, 1)))
         txs = unlist(txslst, use.names=FALSE)
         mcols(txs) = mcdf
         seqinfo(txs) = sqinfo

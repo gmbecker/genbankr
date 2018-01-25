@@ -1,5 +1,5 @@
 Package: genbankr
-Version: 1.7.0
+Version: 1.7.1
 Title: Parsing GenBank files into semantically useful objects
 Description: Reads Genbank files.
 Authors@R: c(person("Gabriel", "Becker", role = c("aut", "cre"),
@@ -13,13 +13,13 @@ Depends:
     methods
 Imports:
     BiocGenerics,
-    IRanges,
-    GenomicRanges(>= 1.23.24),
-    GenomicFeatures,
+    IRanges (>= 2.13.15),
+    GenomicRanges (>= 1.31.10),
+    GenomicFeatures (>= 1.31.5),
     Biostrings,
     VariantAnnotation,
     rtracklayer,
-    S4Vectors,
+    S4Vectors (>= 0.17.28),
     GenomeInfoDb,
     Biobase
 Suggests:
