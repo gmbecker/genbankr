@@ -487,13 +487,8 @@ parseGenBank = function(file, text = readLines(file),  partial = NA,
         typs = sapply(resthang$FEATURES, function(x) x$type[1])
         srcs = fill_stack_df(resthang$FEATURES[typs == "source"])
         ## dss = DNAStringSet(lapply(GRanges(ranges(srcs), function(x) origin[x])))
-        dss = switch(seqtype,
-                     bp = DNAStringSet(lapply(ranges(srcs), function(x) origin[x])),
-                     aa = AAStringSet(lapply(ranges(srcs), function(x) origin[x])),
-                     stop("Unrecognized origin sequence type: ", seqtype)
-                     )
-        names(dss) = sapply(srcs,
-                            function(x) as.character(seqnames(x)[1]))
+        dss = extractAt(origin, ranges(srcs))
+        names(dss) = as.character(seqnames(srcs))
         if(!ret.anno)
             resthang = dss
         else
