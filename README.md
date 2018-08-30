@@ -17,20 +17,22 @@ R packages. If you already have a version of Bioconductor (>=3.3) installed,
 you can do gthe following:
 
 ```
-libary(BiocInstaller)
-biocLite("genbankr")
+libary(BiocManager)
+BiocManager::install("genbankr")
 ```
 
 If you do not currently have the Bioconductor core machinery installed, you can
 get the current or release version like so:
 
 ```
-source("http://bioconductor.org/biocLite.R")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
 ``` 
 for release and
 
 ```
-source("http://bioconductor.org/biocLite.R")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
 try(useDevel(TRUE))
 ```
 For devel.
@@ -38,8 +40,8 @@ For devel.
 After doing one of the above (once), you can install `genbankr` as above, via
 
 ```
-library(BiocInstaller)
-biocLite("genbankr")
+library(BiocManager)
+BiocManager::install("genbankr")
 ```
 
 Note that Bioconductor is a sychronized development and release
@@ -52,9 +54,10 @@ To install directly from github (this will generally not be necessary
 unless you intend to contribute to `genbankr`'s development), do
 
 ```
-source("http://bioconductor.org/biocLite.R")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
 try(useDevel(TRUE))
-biocLite("gmbecker/genbankr")
+BiocManager::install("gmbecker/genbankr")
 ```
 
 The Bioconductor development repository will contain
