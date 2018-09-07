@@ -33,7 +33,7 @@ for release and
 ```
 if (!requireNamespace("BiocManager", quietly=TRUE))
     install.packages("BiocManager")
-try(useDevel(TRUE))
+BiocManager::install(version = "devel")
 ```
 For devel.
 
@@ -56,7 +56,7 @@ unless you intend to contribute to `genbankr`'s development), do
 ```
 if (!requireNamespace("BiocManager", quietly=TRUE))
     install.packages("BiocManager")
-try(useDevel(TRUE))
+BiocManager::install(version = "devel")
 BiocManager::install("gmbecker/genbankr")
 ```
 
