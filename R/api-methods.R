@@ -238,7 +238,7 @@ setMethod(show, "GBAccession",
 
 .genbanksum = function(object) {
         cat(sprintf("%s \nAccession: %s\n%d Sequence(s) with total length length: %d\n", object@definition,
-                object@accession, length(object@sources), sum(sapply(object@sources, width))))
+                object@accession, length(object@sources), sum(width(object@sources))))
     cat(sprintf("%d genes\n%d transcripts\n%d exons/cds elements\n%d variations\n%d other features\n\n",
                 length(genes(object)), length(unique(cds(object)$transcript_id)),
                 length(exons(object)), 

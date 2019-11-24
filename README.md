@@ -1,6 +1,3 @@
-[![](https://badges.ropensci.org/47_status.svg)](https://github.com/ropensci/onboarding/issues/47)
-
-
 ## Package
 
 The `genbankr` package is part of the Bioconductor ecosystem of R packages. As
@@ -20,29 +17,31 @@ R packages. If you already have a version of Bioconductor (>=3.3) installed,
 you can do gthe following:
 
 ```
-libary(BiocInstaller)
-biocLite("genbankr")
+libary(BiocManager)
+BiocManager::install("genbankr")
 ```
 
 If you do not currently have the Bioconductor core machinery installed, you can
 get the current or release version like so:
 
 ```
-source("http://bioconductor.org/biocLite.R")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
 ``` 
 for release and
 
 ```
-source("http://bioconductor.org/biocLite.R")
-try(useDevel(TRUE))
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install(version = "devel")
 ```
 For devel.
 
 After doing one of the above (once), you can install `genbankr` as above, via
 
 ```
-library(BiocInstaller)
-biocLite("genbankr")
+library(BiocManager)
+BiocManager::install("genbankr")
 ```
 
 Note that Bioconductor is a sychronized development and release
@@ -55,35 +54,15 @@ To install directly from github (this will generally not be necessary
 unless you intend to contribute to `genbankr`'s development), do
 
 ```
-source("http://bioconductor.org/biocLite.R")
-try(useDevel(TRUE))
-biocLite("gmbecker/genbankr")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install(version = "devel")
+BiocManager::install("gmbecker/genbankr")
 ```
 
 The Bioconductor development repository will contain
 the latest development version of genbankr which has passed testing (lagged
 by about a day).
-
-## Basic usage
-
-The primary workhorse function in `genbankr` is `readGenBank()`. To read a genbank
-file, simply call this function on the downloaded file, or on a GBAccession object.
-
-```
-library(genbankr)
-mygbk = readGenbank("gbkfile.gbk")
-```
-
-For a more complete discussion of how to use the `genbankr` package, please see
-the compiled vignette [here](https://bioconductor.org/packages/release/bioc/vignettes/genbankr/inst/doc/genbankr.html)
-
-
-## Help and filing bugs
-
-Please post any usage questions about `genbankr` on the Bioconductor Support Site
-[here](https://support.bioconductor.org/) with the tag genbankr.
-
-Bugs and feature requests can be filed as issues on this Github repository.
 
 ## Code of Conduct
 

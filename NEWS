@@ -1,3 +1,14 @@
+Changes in version 1.3.2
+------------------------
+
+BUGFIXES
+
+      o Circularity (from LOCUS header information) is now applied
+      	to all sources in the file.
+
+      o Improved assertion related to id ordering in makeTxDbFromGenBank
+        which passed in previous R version but was failing in recent ones
+
 Changes in version 1.1.5
 ------------------------
 

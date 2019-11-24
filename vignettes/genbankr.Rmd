@@ -1,12 +1,10 @@
 ---
-title: "The genbankr package"
-author: "Gabriel Becker"
-output: 
-  BiocStyle::html_document
+output: BiocStyle::html_document
 vignette: >
-  %\VignetteIndexEntry{genbankr}
-  %\VignetteEngine{rmarkdown::rmarkdown}
-  %\VignetteEncoding{UTF-8}  
+  %\VignetteIndexEntry{An introduction to genbankr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteDepends{BiocStyle}
+  \usepackage[utf8]{inputenc}
 ---
 
 
