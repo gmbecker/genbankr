@@ -314,13 +314,13 @@ setMethod("intergenic", "GenBankRecord",
     strand(gns) = "*"
     spl = split(gns, seqnames(gns))
     res = GRangesList(lapply(spl, function(chrgns) {
+    ##    browser()
         src = x@sources[seqnames(x@sources) == seqnames(chrgns)[1] ]
                        
         ig = gaps(chrgns, start(src), end(src))
         ig = ig[strand(ig) == "*"]
         nrright = precede(ig, chrgns)
         nrleft = follow(ig, chrgns)
-        excl = is.na(nrright) || is.na(nrleft)
         lftlab = chrgns$gene[na.omit(nrleft)]
         rtlab = chrgns$gene[na.omit(nrright)]
         if(is.na(nrleft[1]))
