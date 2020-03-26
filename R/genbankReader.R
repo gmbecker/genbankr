@@ -1,3 +1,7 @@
+## utility borrowed from Hadley et al. rlang
+`%||%` <- function(a, b) if(is.null(a)) b else a
+
+
 ## check if <1 means circular passing across boundary
 ## check how insertion before first element is specified
 
@@ -104,7 +108,15 @@ readGenBank = function(file, text = readLines(file), partial = NA,
         else if (!file.exists(file))
             stop("file does not appear to an existing file or a GBAccession object. Valid file or text argument is required.")
     }
-            
+
+    if(is(text, "character") &&
+       length(recbrks <- grep(record_brk_re, text)) > 1) {
+        sq = seq_along(text)
+        indfac = cut(sq, breaks = recbrks[-length(recbrks)])
+        text = split(text, indfac)
+        stopifnot(all(sapply(text,
+                             function(x) identical(substr(x[1], 1, 5), "LOCUS"))))
+    }
     if(is(text, "list"))
         return(lapply(text, function(txt) readGenBank(text = txt, partial = partial, ret.seq= ret.seq, verbose = verbose)))
     ## we always read in sequence because it is required for variant annotations
@@ -149,6 +161,8 @@ prime_field_re = "^[[:upper:]]+[[:space:]]+"
 sec_field_re = "^( {5}|\\t)[[:alnum:]'_]+[[:space:]]+(complement|join|order|[[:digit:]<,])"
 
 strip_fieldname = function(lines) gsub("^[[:space:]]*[[:upper:]]*[[:space:]]+", "", lines)
+
+record_brk_re = "^[[:space:]]*//[[:space:]]*$" ## tthe space probbly aren' needed here...
 
 
 ## Functions to read in the fields of a GenBank file
@@ -775,7 +789,7 @@ make_txgr = function(rawtxs, exons, sqinfo, genes) {
         txs = GRanges(seqinfo=sqinfo)
     } else {
         message("No transcript features (mRNA) found, using spans of CDSs")
-        spl = split(exons, exons$transcript_id)
+        spl = split(exons, exons$transcript_id %||% "unknown")
         txslst = range(spl)
         mcdf = mcols(unlist(heads(spl, 1)))
         txs = unlist(txslst, use.names=FALSE)
@@ -837,7 +851,8 @@ make_exongr = function(rawex, cdss, sqinfo) {
         }
             
     } else {
-        exns = stack(exns)
+        if(is(exns, "GRangesList"))
+            exns = stack(exns)
     
         hits = findOverlaps(exns, cdss, type = "within", select = "all")
         qh = queryHits(hits)
@@ -874,6 +889,12 @@ make_genegr = function(x, sqinfo) {
     res
 }
 
+gn_from_vers = function(x) {
+    if(is.null(x))
+        "unknown"
+    else
+        strsplit(x, " ")[[1]][1]
+}
 
 
 ##' @importFrom GenomeInfoDb seqlevels seqinfo Seqinfo
@@ -901,7 +922,7 @@ make_gbrecord = function(rawgbk, verbose = FALSE) {
     srcs = fill_stack_df(featspl$source)
     circ = rep(grepl("circular", rawgbk$LOCUS), times = length(srcs))
     ##grab the versioned accession to use as the "genome" in seqinfo
-    genom = strsplit(rawgbk$VERSION, " ")[[1]][1]
+    genom = gn_from_vers(rawgbk$VERSION)
     sqinfo = Seqinfo(seqlevels(srcs), width(srcs), circ, genom)
     if(verbose)
         message(Sys.time(), " Starting creation of gene GRanges")
@@ -944,8 +965,8 @@ make_gbrecord = function(rawgbk, verbose = FALSE) {
               transcripts = txs, variations = vars,
               sources = fill_stack_df(feats[typs == "source"]),
               other_features = ofeats,
-              accession = rawgbk$ACCESSION,
-              version = rawgbk$VERSION,
+              accession = rawgbk$ACCESSION %||% NA_character_,
+              version = rawgbk$VERSION %||% NA_character_,
               locus = rawgbk$LOCUS,
               definition = rawgbk$DEFINITION,
               sequence = sq)

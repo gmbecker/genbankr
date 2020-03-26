@@ -320,7 +320,6 @@ setMethod("intergenic", "GenBankRecord",
         ig = ig[strand(ig) == "*"]
         nrright = precede(ig, chrgns)
         nrleft = follow(ig, chrgns)
-        excl = is.na(nrright) || is.na(nrleft)
         lftlab = chrgns$gene[na.omit(nrleft)]
         rtlab = chrgns$gene[na.omit(nrright)]
         if(is.na(nrleft[1]))
