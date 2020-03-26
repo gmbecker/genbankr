@@ -1,5 +1,5 @@
 Package: genbankr
-Version: 1.15.1
+Version: 1.15.2
 Title: Parsing GenBank files into semantically useful objects
 Description: Reads Genbank files.
 Authors@R: c(person("Gabriel", "Becker", role = c("aut", "cre"),

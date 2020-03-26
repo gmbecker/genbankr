@@ -789,7 +789,7 @@ make_txgr = function(rawtxs, exons, sqinfo, genes) {
         txs = GRanges(seqinfo=sqinfo)
     } else {
         message("No transcript features (mRNA) found, using spans of CDSs")
-        spl = split(exons, exons$transcript_id)
+        spl = split(exons, exons$transcript_id %||% "unknown")
         txslst = range(spl)
         mcdf = mcols(unlist(heads(spl, 1)))
         txs = unlist(txslst, use.names=FALSE)
@@ -851,7 +851,8 @@ make_exongr = function(rawex, cdss, sqinfo) {
         }
             
     } else {
-        exns = stack(exns)
+        if(is(exns, "GRangesList"))
+            exns = stack(exns)
     
         hits = findOverlaps(exns, cdss, type = "within", select = "all")
         qh = queryHits(hits)
