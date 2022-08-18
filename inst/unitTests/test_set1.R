@@ -22,7 +22,7 @@ test_JoinCompl = function() {
     gba = genbankr::make_gbrecord(raw)
     cdss = cds(gba)
     checkEquals(length(cdss), 6L, "Complement join/complement order test did not detect all 6 cds fragments (3 for comp(join()) and 3 for comp(order)).")
-    
+
 }
 
 test_RetSeqFalse = function() {
@@ -47,8 +47,8 @@ test_getSeq = function() {
     sq = getSeq(fil)
     checkTrue(is(sq, "DNAStringSet") && Biostrings::width(sq) == 11820)
 }
-    
-    
+
+
 test_genpept = function() {
     fil = system.file("unitTests/ABD64816.1.gpt", package="genbankr")
     res1 = readGenBank(fil)
@@ -61,7 +61,7 @@ test_partial = function() {
 
     res2 = readGenBank(fil, partial=FALSE)
     checkIdentical(res1, res2, "Checking that partial=NA and partial=FALSE result in the same object")
-    
+
     res3 = readGenBank(fil, partial=TRUE)
     checkTrue(length(genes(res3)) == 1, "Checking that partial=TRUE retains a partial feature")
 }
@@ -82,3 +82,10 @@ test_locustagusage = function() {
     checkTrue(all(cdss$gene_id %in% gns$gene_id), msg = "checking that cds GRanges gets the right gene_id when locus_tag is available")
     checkTrue(all(txs$gene_id %in% gns$gene_id), msg = "checking that transcripts GRanges gets the right gene_id when locus_tag is available")
 }
+
+
+test_regression_18 = function() {
+    thing = readGenBank(system.file("unitTests/test_t_inaccession.gbk", package="genbankr"))
+    checkTrue(identical(accession(thing), "Salvelinus_fonti"))
+}
+

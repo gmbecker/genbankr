@@ -170,7 +170,7 @@ record_brk_re = "^[[:space:]]*//[[:space:]]*$" ## tthe space probbly aren' neede
 
 readLocus = function(line) {
     ## missing strip fieldname?
-    spl = strsplit(line, "[\\t]+", line)[[1]]
+    spl = strsplit(line, "[\t]+", line)[[1]]
     spl
 }
 
