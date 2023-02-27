@@ -18,7 +18,7 @@ NULL
 ##' @description Read a GenBank file from a local file, or retrieve
 ##' and read one based on an accession number. See Details for exact
 ##' behavior.
-##' 
+##'
 ##' @param file character or GBAccession. The path to the file, or a GBAccession object containing Nuccore versioned accession numbers. Ignored if \code{text} is specified.
 ##' @param text character. The text of the file. Defaults to text within \code{file}
 ##' @param partial logical. If TRUE, features with non-exact boundaries will
@@ -32,20 +32,20 @@ NULL
 ##'
 ##' @details If a a \code{GBAccession} object is passed to \code{file}, the
 ##' rentrez package is used to attempt to fetch full GenBank records for all
-##' ids in the 
+##' ids in the
 ##'
 ##' Often times, GenBank files don't contain exhaustive annotations.
 ##' For example, files including CDS annotations often do not have separate
 ##' transcript features.  Furthermore, chromosomes are not always named,
 ##' particularly in organisms that have only one. The details of how genbankr
 ##' handles such cases are as follows:
-##' 
+##'
 ##' In files where CDSs are annotated but individual exons are not, 'approximate
 ##' exons' are defined as the individual contiguous elements within each CDS.
 ##' Currently, no mixing of approximate and explicitly annotated exons is
 ##' performed, even in cases where, e.g., exons are not annotated for some
 ##' genes with CDS annotations.
-##' 
+##'
 ##' In files where transcripts are not present, 'approximate transcripts'
 ##' defined by the ranges spanned by groups of exons are used.  Currently, we do
 ##' not support generating approximate transcripts from CDSs in files that
@@ -89,7 +89,7 @@ NULL
 ##' lower-level parseGenBank does skil parsing the sequence at all via
 ##' \code{ret.seq=FALSE}, but variant annotations will be excluded if
 ##' make_gbrecord is called on the resulting parsed list.
-##' 
+##'
 ##' @return A \code{GenBankRecord} object containing (most,
 ##' see detaisl) of the information within \code{file}/\code{text} Or a list of
 ##' \code{GenBankRecord} objects in cases where a
@@ -143,7 +143,7 @@ readGenBank = function(file, text = readLines(file), partial = NA,
     }
     if(length(foundids) == 0)
         stop("None of the specified id(s) were found in the nuccore database")
-    
+
     res = rentrez::entrez_fetch("nuccore", foundids, rettype="gbwithparts", retmode="text")
 
     lines = fastwriteread(res)
@@ -158,7 +158,7 @@ readGenBank = function(file, text = readLines(file), partial = NA,
 
 
 prime_field_re = "^[[:upper:]]+[[:space:]]+"
-sec_field_re = "^( {5}|\\t)[[:alnum:]'_]+[[:space:]]+(complement|join|order|[[:digit:]<,])"
+sec_field_re = "^( {5}|\\t)[[:alnum:]'_-]+[[:space:]]+(complement|join|order|[[:digit:]<,])"
 
 strip_fieldname = function(lines) gsub("^[[:space:]]*[[:upper:]]*[[:space:]]+", "", lines)
 
@@ -208,12 +208,12 @@ readSource = function(lines) {
 chk_outer_complement = function(str) grepl("[^(]*complement\\(", str)
 strip_outer_operator = function(str, op = "complement") {
     regex = paste0("[^(]*", op, "\\((.*)\\)")
-    
+
     gsub(regex,"\\1", str)
 }
 
 .do_join_silliness = function(str, chr, ats, partial = NA, strand = NA) {
-    
+
                                         #    if(grepl("^join", str))
     if(is.na(partial) || !partial) {
         part = grepl("[<>]", str)
@@ -230,11 +230,11 @@ strip_outer_operator = function(str, op = "complement") {
             )
         }
     }
-        
+
     sstr = substr(str, 1, 1)
     if(sstr == "j") ##join
         str = strip_outer_operator(str, "join")
-    else if(sstr == "o") ## order 
+    else if(sstr == "o") ## order
         str = strip_outer_operator(str, "order")
     spl = strsplit(str, ",", fixed=TRUE)[[1]]
     grs = lapply(spl, make_feat_gr, chr = chr, ats = ats,
@@ -249,17 +249,17 @@ make_feat_gr = function(str, chr, ats, partial = NA, strand = NA) {
     if(is.na(strand) && chk_outer_complement(str)) {
         strand = "-"
         str = strip_outer_operator(str)
-    } 
-    
-    
+    }
+
+
     sbstr = substr(str, 1, 4)
     if(sbstr == "join" || sbstr == "orde")
         return(.do_join_silliness(str = str, chr = chr,
                                   ats = ats, partial = partial,
                                   strand = strand))
     haslt = grepl("<", str, fixed=TRUE) || grepl(">", str, fixed=TRUE)
-    
-    
+
+
     ## control with option. Default to exclude those ranges entirely.
     ##    if( (haslt || hasgt ) && (is.na(partial) || !partial) ){
     if( haslt  && (is.na(partial) || !partial) ){
@@ -268,7 +268,7 @@ make_feat_gr = function(str, chr, ats, partial = NA, strand = NA) {
                     "Omitting feature at ", str)
         return(GRanges(character(), IRanges(numeric(), numeric())))
     }
-    
+
     ## format is 123, 123..789, or 123^124
     spl = strsplit(str, "[.^]{1,2}")[[1]]
     start = as.integer(gsub("<*([[:digit:]]+).*", "\\1", spl[1]))
@@ -281,7 +281,7 @@ make_feat_gr = function(str, chr, ats, partial = NA, strand = NA) {
         ats$loctype = "insert"
     } else
         ats$loctype = "normal"
-    
+
     if(is.na(strand))
         strand = "+"
 
@@ -305,7 +305,7 @@ read_feat_attr = function(line) {
 
 ## XXX is the leading * safe here? whitespace is getting clobbered by line
 ##combination below I think it's ok
-strip_feat_type = function(ln) gsub("^[[:space:]]*[[:alnum:]_']+[[:space:]]+((complement\\(|join\\(|order\\(|[[:digit:]<]+).*)", "\\1", ln)
+strip_feat_type = function(ln) gsub("^[[:space:]]*[[:alnum:]_'-]+[[:space:]]+((complement\\(|join\\(|order\\(|[[:digit:]<]+).*)", "\\1", ln)
 
 readFeatures = function(lines, partial = NA, verbose = FALSE,
                         source.only = FALSE) {
@@ -313,46 +313,46 @@ readFeatures = function(lines, partial = NA, verbose = FALSE,
         lines = lines[-1] ## consume FEATURES line
     fttypelins = grepl(sec_field_re, lines)
     featfactor  = cumsum(fttypelins)
-    
+
     if(source.only) {
         srcfeats = which(substr(lines[fttypelins], 6, 11) == "source")
         keepinds = featfactor %in% srcfeats
         lines = lines[keepinds]
         featfactor = featfactor[keepinds]
     }
-    
+
     ##scope bullshittery
     chr = "unk"
-    
+
     totsources = length(grep("[[:space:]]+source[[:space:]]+[<[:digit:]]", lines[which(fttypelins)]))
     numsources = 0
     everhadchr = FALSE
-    
+
     do_readfeat = function(lines, partial = NA) {
-        
+
         ## before collapse so the leading space is still there
-        type = gsub("[[:space:]]+([[:alnum:]_']+).*", "\\1", lines[1])
+        type = gsub("[[:space:]]+([[:alnum:]_'-]+).*", "\\1", lines[1])
         ##feature/location can go across multpiple lines x.x why genbank? whyyyy
         attrstrts = cumsum(grepl("^[[:space:]]+/[^[:space:]]+($|=([[:digit:]]|\"))", lines))
         lines = tapply(lines, attrstrts, function(x) {
             paste(gsub("^[[:space:]]+", "", x), collapse="")
         }, simplify=TRUE)
-        
+
         rawlocstring = lines[1]
-        
+
         rngstr = strip_feat_type(rawlocstring)
-        
+
         ## consume primary feature line
-        lines = lines[-1] 
+        lines = lines[-1]
         if(length(lines)) {
             attrs = read_feat_attr(lines)
-            
+
             names(attrs) = gsub("^[[:space:]]*/([^=]+)($|=[^[:space:]].*$)", "\\1", lines)
             if(type == "source") {
                 numsources <<- numsources + 1
                 if("chromosome" %in% names(attrs)) {
                     if(numsources > 1 && !everhadchr)
-                        stop("This file appears to have some source features which specify chromosome names and others that do not. This is not currently supported. Please contact the maintainer if you need this feature.")    
+                        stop("This file appears to have some source features which specify chromosome names and others that do not. This is not currently supported. Please contact the maintainer if you need this feature.")
                     everhadchr <<- TRUE
                     chr <<- attrs$chromosome
                 } else if(everhadchr) {
@@ -370,18 +370,18 @@ readFeatures = function(lines, partial = NA, verbose = FALSE,
         }
         make_feat_gr(str = rngstr, chr = chr, ats = c(type = type, attrs),
                      partial = partial)
-        
+
     }
-    
+
     if(verbose)
         message(Sys.time(), " Starting feature parsing")
     resgrs = tapply(lines, featfactor, do_readfeat,
                     simplify=FALSE, partial = partial)
     if(verbose)
         message(Sys.time(), " Done feature parsing")
-    
+
     resgrs
-    
+
 }
 
 
@@ -389,7 +389,7 @@ readFeatures = function(lines, partial = NA, verbose = FALSE,
 readOrigin = function(lines, seqtype = "bp") {
     ## strip spacing and line numbering
     regex = "([[:space:]]+|[[:digit:]]+|//)"
-    
+
     dnachar = gsub(regex, "", lines[-1])
     chars = paste(dnachar, collapse="")
     if(any(nzchar(dnachar))) {
@@ -407,7 +407,7 @@ fastwriteread = function(txtline) {
     on.exit(close(f))
     writeLines(txtline, con = f)
     readLines(f)
-    
+
 }
 
 
@@ -461,11 +461,11 @@ parseGenBank = function(file, text = readLines(file),  partial = NA,
         stop("No text provided and file does not exist or was not specified. Either an existing file or text to parse must be provided.")
     if(length(text) == 1)
         text = fastwriteread(text)
-    
+
     fldlines = grepl(prime_field_re, text)
     fldfac = cumsum(fldlines)
     fldnames = gsub("^([[:upper:]]+).*", "\\1", text[fldlines])[fldfac]
-    
+
     spl = split(text, fldnames)
 
     resthang = list(LOCUS = readLocus(spl[["LOCUS"]]))
@@ -477,7 +477,7 @@ parseGenBank = function(file, text = readLines(file),  partial = NA,
                           readOrigin(spl[["ORIGIN"]],
                                      seqtype = seqtype)
                       else NULL
-    
+
     if(ret.anno) {
         resthang2 = mapply(function(field, lines, verbose) {
             switch(field,
@@ -496,7 +496,7 @@ parseGenBank = function(file, text = readLines(file),  partial = NA,
         resthang = c(resthang, resthang2)
     }
     ##DNAString to DNAStringSet
-    origin = resthang$ORIGIN 
+    origin = resthang$ORIGIN
     if(ret.seq && length(origin) > 0) {
         typs = sapply(resthang$FEATURES, function(x) x$type[1])
         srcs = fill_stack_df(resthang$FEATURES[typs == "source"])
@@ -512,10 +512,10 @@ parseGenBank = function(file, text = readLines(file),  partial = NA,
     }
     af = proc.time()["elapsed"]
     if(verbose)
-        message("Done Parsing raw GenBank file text. [ ", af-bf, " seconds ]") 
+        message("Done Parsing raw GenBank file text. [ ", af-bf, " seconds ]")
     resthang
 
-    
+
 }
 
 
@@ -542,13 +542,13 @@ fill_stack_df = function(dflist, cols, fill.logical = TRUE, sqinfo = NULL) {
                 paste(setdiff(dupnms, multivalfields), collapse = ", "),
                 " ]. The resulting column(s) will be of class CharacterList, rather than vector(s). Please contact the maintainer if multi-valuedness is expected/meaningful for the listed field(s).")
     allcols = unique(basenms)
-    
+
     logcols = unique(unlist(lapply(dflist, function(x) names(x)[sapply(x, is.logical)])))
     charcols = setdiff(allcols, logcols)
-    
+
     if(missing(cols))
         cols = allcols
-    
+
     filled = mapply(
         function(x, i) {
         ## have to deal with arbitrary multiple columns
@@ -558,17 +558,17 @@ fill_stack_df = function(dflist, cols, fill.logical = TRUE, sqinfo = NULL) {
             if(length(locs)) {
                 rows = lapply(seq(along = rownames(x)),
                               function(y) unlist(x[y,locs]))
-                
+
                 x = x[,-locs]
             } else {
                 rows = list(character())
             }
-            
+
             x[[nm]] = rows
         }
-        
-        
-        
+
+
+
         ## setdiff is not symmetric
         missnm = setdiff(charcols, names(x))
         x[,missnm] = NA_character_
@@ -580,7 +580,7 @@ fill_stack_df = function(dflist, cols, fill.logical = TRUE, sqinfo = NULL) {
     }, x = dflist, i = seq(along = dflist), SIMPLIFY=FALSE)
     stk = .simple_rbind_dataframe(filled, "temp")
     stk[["temp"]] = NULL
-    
+
     listcols = which(sapply(names(stk),
                             function(x) is(stk[[x]], "list") ||
                                         x %in% multivalfields))
@@ -597,7 +597,7 @@ fill_stack_df = function(dflist, cols, fill.logical = TRUE, sqinfo = NULL) {
     grstk = GRanges(seqnames = stk$seqnames,
                     ranges = IRanges(start = stk$start, end = stk$end),
                     strand = stk$strand )
-    
+
     ## this may be slightly slower, but specifying mcols during
     ## creation appends mcols. to all the column names, super annoying.
     mcols(grstk) = stk[,mc]
@@ -660,18 +660,18 @@ match_cds_genes = function(cds, genes) {
 
 
 make_cdsgr = function(rawcdss, gns, sqinfo) {
-  
+
     ##    rawcdss = sanitize_feats(rawcdss, cds_cols)
     rawcdss = fill_stack_df(rawcdss, sqinfo = sqinfo)
     ## double order gives us something that can be merged directly into what
     ## out of tapply
 
     havegenelabs = FALSE
-    
+
     rawcdss$gene_id = .getGeneIdVec(rawcdss)
-        
+
     if(!is.null(rawcdss$gene_id) && !anyNA(rawcdss$gene_id)) {
-   
+
         o = order(order(rawcdss$gene_id))
         var = "gene_id"
     } else {
@@ -705,7 +705,7 @@ make_cdsgr = function(rawcdss, gns, sqinfo) {
     if(anyDuplicated(subhits)) {
         duphits = which(duplicated(subhits))
         dupstart = start(heads(txfeatlst[duphits], 1))
-        
+
         if(stopondup)
             stop("mRNA feature(s) starting at [",
                  paste(as.vector(dupstart), collapse=", "),
@@ -723,7 +723,7 @@ make_cdsgr = function(rawcdss, gns, sqinfo) {
     ## think it will be too slow. We'll see ....
 
     keep = subhits %in% unknown
-    
+
     knownlabs[ subhits[ keep ] ] = names(gnfeat)[ queryHits(hts)[ keep ] ]
     knownlabs
 }
@@ -731,14 +731,14 @@ make_cdsgr = function(rawcdss, gns, sqinfo) {
 
 ##' @param rawtx GRanges. Raw transcript (mRNA) feature GRanges
 ##' @param exons GRanges. Exon feature GRanges
-##' @param genes GRanges. genes 
+##' @param genes GRanges. genes
 assignTxsToGenes = function(rawtx, exons, genes) {
 
     txspl = split(rawtx, rawtx$temp_grouping_id)
 
     gnlabs = rep(NA_character_, times = length(txspl))
-    
-    ## exon mapping is more precise, try that first.    
+
+    ## exon mapping is more precise, try that first.
     ## exons should fall strictly within transcript sections
     ## not identical b/c of padding at ends. AFAIK should
     ## be identical for internal exons, but we aren't
@@ -746,14 +746,14 @@ assignTxsToGenes = function(rawtx, exons, genes) {
 
     gnlabs = .gnMappingHlpr(exons, txspl, gnlabs)
     if(anyNA(gnlabs)) {
-        
+
         ## damn, now we have to try with genes
         gnlabs = .gnMappingHlpr(genes, txspl, gnlabs,
                             olaptype = "any",
                             stopondup=FALSE)
 
     }
-    
+
     rawtx$gene_id= rep(gnlabs, times = lengths(txspl))
     rawtx
 
@@ -770,7 +770,7 @@ make_txgr = function(rawtxs, exons, sqinfo, genes) {
             rawtxs = assignTxsToGenes(rawtxs, exons, genes)
             gvec = .getGeneIdVec(rawtxs)
         }
-            
+
         rawtxs$tx_id_base = ifelse(is.na(gvec), paste("unknown_gene", cumsum(is.na(gvec)), sep="_"), gvec)
         spltxs = split(rawtxs, rawtxs$tx_id_base)
         txsraw = lapply(spltxs, function(grl) {
@@ -809,7 +809,7 @@ make_varvr = function(rawvars, sq, sqinfo) {
         warning("importing variation features when origin sequence is not included in the file is not currently supported. Skipping ", length(rawvars), " variation features.")
         return(VRanges(seqinfo = sqinfo))
     }
-        
+
     vrs = fill_stack_df(rawvars, sqinfo = sqinfo)
     vrs$temp_grouping_id = NULL
     ## not all variants have /replace so we can't assume that ANY of them
@@ -849,11 +849,11 @@ make_exongr = function(rawex, cdss, sqinfo) {
         } else {
             return(GRanges(seqinfo = sqinfo))
         }
-            
+
     } else {
         if(is(exns, "GRangesList"))
             exns = stack(exns)
-    
+
         hits = findOverlaps(exns, cdss, type = "within", select = "all")
         qh = queryHits(hits)
         qhtab = table(qh)
@@ -871,7 +871,7 @@ make_exongr = function(rawex, cdss, sqinfo) {
         }
 
         exns$transcript_id = cdss$transcript_id[subjectHits(noduphits)]
-        
+
     }
     exns$temp_grouping_id = NULL
     exns
@@ -884,7 +884,7 @@ make_genegr = function(x, sqinfo) {
         res = GRanges(seqinfo = sqinfo)
     else
         res$gene_id = .getGeneIdVec(res)
-    
+
     res$temp_grouping_id = NULL
     res
 }
@@ -912,7 +912,7 @@ make_gbrecord = function(rawgbk, verbose = FALSE) {
     bf = proc.time()["elapsed"]
     feats = rawgbk$FEATURES
     sq = rawgbk$ORIGIN
-    
+
     typs = sapply(feats, function(x)
         if(length(x) > 0) x$type[1] else NA_character_)
     empty = is.na(typs)
@@ -927,7 +927,7 @@ make_gbrecord = function(rawgbk, verbose = FALSE) {
     if(verbose)
         message(Sys.time(), " Starting creation of gene GRanges")
     gns = make_genegr(featspl$gene, sqinfo)
-    
+
     if(verbose)
         message(Sys.time(), " Starting creation of CDS GRanges")
     if(!is.null(featspl$CDS))
@@ -937,19 +937,19 @@ make_gbrecord = function(rawgbk, verbose = FALSE) {
     if(verbose)
         message(Sys.time(), " Starting creation of exon GRanges")
 
-    
+
     exns = make_exongr(featspl$exon, cdss = cdss, sqinfo)
 
     if(verbose)
         message(Sys.time(), " Starting creation of variant VRanges")
     vars = make_varvr(featspl$variation, sq = sq, sqinfo)
- 
-    
+
+
     if(verbose)
         message(Sys.time(), " Starting creation of transcript GRanges")
 
     txs = make_txgr(featspl$mRNA, exons = exns, sqinfo, genes = gns)
-    
+
     if(verbose)
         message(Sys.time(), " Starting creation of misc feature GRanges")
 
@@ -972,10 +972,10 @@ make_gbrecord = function(rawgbk, verbose = FALSE) {
               sequence = sq)
     af = proc.time()["elapsed"]
     if(verbose)
-        message(Sys.time(), " - Done creating GenBankRecord object [ ", af - bf, " seconds ]") 
+        message(Sys.time(), " - Done creating GenBankRecord object [ ", af - bf, " seconds ]")
     res
 }
-    
+
 
 
 ## super fast rbind of data.frame lists from Pete Haverty
