@@ -17,7 +17,7 @@ R packages. If you already have a version of Bioconductor (>=3.3) installed,
 you can do gthe following:
 
 ```
-libary(BiocManager)
+library(BiocManager)
 BiocManager::install("genbankr")
 ```
 
